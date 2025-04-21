@@ -68,17 +68,3 @@ const Home = () => {
 export default Home;
 
 
-// import React, { useState } from 'react';
-// import { Link } from 'react-router-dom';
-
-// const Home = () => {
-//   return (
-//     <div>
-//       <h2>Home Page</h2>
-//       <p>Welcome to the homepage!</p>
-//       <Link to="/dashboard">Go to Dashboard</Link>
-//     </div>
-//   );
-// };
-
-// export default Home;
