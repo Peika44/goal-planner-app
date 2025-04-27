@@ -1,122 +1,194 @@
-// pages/ProfilePage.jsx
-import React, { useState, useEffect } from 'react';
-import Navbar from '../components/layout/Navbar';
-import { useAuth } from '../hooks/useAuth';
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { updateProfile } from '../api/authApi';
 
 const ProfilePage = () => {
-  const { currentUser, updateProfile, error, loading } = useAuth();
+  const { currentUser, setCurrentUser } = useAuth();
   
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    bio: '',
+    firstName: currentUser?.firstName || '',
+    lastName: currentUser?.lastName || '',
+    email: currentUser?.email || '',
+    username: currentUser?.username || '',
+    password: '',
+    confirmPassword: ''
   });
   
-  const [successMessage, setSuccessMessage] = useState('');
-  
-  useEffect(() => {
-    if (currentUser) {
-      setFormData({
-        name: currentUser.name || '',
-        email: currentUser.email || '',
-        bio: currentUser.bio || '',
-      });
-    }
-  }, [currentUser]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const success = await updateProfile(formData);
+    // Validate passwords if provided
+    if (formData.password && formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
     
-    if (success) {
-      setSuccessMessage('Profile updated successfully');
+    // Create update data (don't send empty password)
+    const updateData = { ...formData };
+    if (!updateData.password) {
+      delete updateData.password;
+    }
+    delete updateData.confirmPassword;
+    
+    try {
+      setLoading(true);
+      setError('');
+      setSuccess('');
       
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+      const response = await updateProfile(updateData);
+      
+      if (response.success) {
+        // Update user data in context
+        setCurrentUser(response.user);
+        
+        // Show success message
+        setSuccess('Profile updated successfully');
+        
+        // Clear password fields
+        setFormData(prev => ({
+          ...prev,
+          password: '',
+          confirmPassword: ''
+        }));
+      } else {
+        setError(response.error || 'Failed to update profile');
+      }
+    } catch (err) {
+      console.error('Update profile error:', err);
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
   
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Your Profile</h1>
-          
-          {successMessage && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-              {successMessage}
-            </div>
-          )}
-          
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-              {error}
-            </div>
-          )}
-          
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Name
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
+      
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <p>{error}</p>
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          <p>{success}</p>
+        </div>
+      )}
+      
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                First Name
               </label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="p-2 border border-gray-300 rounded-md w-full"
               />
             </div>
             
-            <div className="mb-6">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                Last Name
               </label>
               <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                readOnly
+                className="p-2 border border-gray-300 rounded-md w-full"
               />
-              <p className="text-sm text-gray-500 mt-1">Email cannot be changed</p>
             </div>
-            
-            <div className="mb-6">
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">
-                Bio
-              </label>
-              <textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                rows="4"
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              ></textarea>
-            </div>
-            
+          </div>
+          
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className="p-2 border border-gray-300 rounded-md w-full"
+              required
+            />
+          </div>
+          
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="p-2 border border-gray-300 rounded-md w-full"
+              required
+            />
+          </div>
+          
+          <div className="mb-4">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              New Password (leave blank to keep current)
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="p-2 border border-gray-300 rounded-md w-full"
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              Confirm New Password
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="p-2 border border-gray-300 rounded-md w-full"
+            />
+          </div>
+          
+          <div className="text-right">
             <button
               type="submit"
-              className="w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               disabled={loading}
+              className={`${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white font-medium py-2 px-4 rounded-md`}
             >
               {loading ? 'Updating...' : 'Update Profile'}
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   );

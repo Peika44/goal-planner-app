@@ -1,36 +1,60 @@
-// components/dashboard/ProgressSummary.jsx
 import React from 'react';
 
 const ProgressSummary = ({ goals }) => {
-  // Calculate overall statistics
+  // Check if goals is an array before using array methods
+  if (!Array.isArray(goals)) {
+    return (
+      <div className="progress-summary bg-white p-6 rounded-lg shadow mb-6">
+        <h2 className="text-xl font-semibold mb-4">Goals Progress</h2>
+        <p>Loading goals data...</p>
+      </div>
+    );
+  }
+
+  // Only execute this code if goals is an array
   const totalGoals = goals.length;
-  const activeGoals = goals.filter(goal => !goal.completed).length;
-  const completedGoals = goals.filter(goal => goal.completed).length;
+  const completedGoals = goals.filter(goal => goal.isCompleted).length;
+  const activeGoals = totalGoals - completedGoals;
   
-  // Calculate total tasks statistics across all goals
-  const allTasks = goals.flatMap(goal => goal.tasks || []);
-  const totalTasks = allTasks.length;
-  const completedTasks = allTasks.filter(task => task.completed).length;
-  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  
-  const stats = [
-    { name: 'Active Goals', value: activeGoals },
-    { name: 'Completed Goals', value: completedGoals },
-    { name: 'Completion Rate', value: `${completionRate}%` },
-  ];
+  // Calculate completion percentage
+  const completionPercentage = totalGoals === 0 
+    ? 0 
+    : Math.round((completedGoals / totalGoals) * 100);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Progress Summary</h3>
-      
-      <dl className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        {stats.map((stat) => (
-          <div key={stat.name} className="px-4 py-5 bg-gray-50 rounded-lg overflow-hidden sm:p-6">
-            <dt className="text-sm font-medium text-gray-500 truncate">{stat.name}</dt>
-            <dd className="mt-1 text-3xl font-semibold text-gray-900">{stat.value}</dd>
+    <div className="progress-summary bg-white p-6 rounded-lg shadow mb-6">
+      <h2 className="text-xl font-semibold mb-4">Goals Progress</h2>
+      <div className="flex justify-between mb-4">
+        <div className="flex-1">
+          <p className="text-gray-600">Total Goals</p>
+          <p className="text-2xl font-bold">{totalGoals}</p>
+        </div>
+        <div className="flex-1">
+          <p className="text-gray-600">Active</p>
+          <p className="text-2xl font-bold text-blue-600">{activeGoals}</p>
+        </div>
+        <div className="flex-1">
+          <p className="text-gray-600">Completed</p>
+          <p className="text-2xl font-bold text-green-600">{completedGoals}</p>
+        </div>
+      </div>
+      <div className="relative pt-1">
+        <div className="flex mb-2 items-center justify-between">
+          <div>
+            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-green-600 bg-green-200">
+              Progress
+            </span>
           </div>
-        ))}
-      </dl>
+          <div className="text-right">
+            <span className="text-xs font-semibold inline-block text-green-600">
+              {completionPercentage}%
+            </span>
+          </div>
+        </div>
+        <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-200">
+          <div style={{ width: `${completionPercentage}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"></div>
+        </div>
+      </div>
     </div>
   );
 };

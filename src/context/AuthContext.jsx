@@ -1,79 +1,95 @@
-// context/AuthContext.jsx
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import axios from '../api/axios';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { getCurrentUser, logout, isLoggedIn } from '../api/authApi';
 
+// Create the context
 const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
+// Custom hook to use the auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
+// Provider component
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      
-      try {
-        const response = await axios.get('/auth/user');
-        setCurrentUser(response.data);
-      } catch (err) {
-        console.error('Error fetching user data', err);
-        // Clear token if it's invalid or expired
-        if (err.response?.status === 401) {
-          localStorage.removeItem('token');
+  // Function to check auth status
+  const checkAuthStatus = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Only attempt to get user data if a token exists
+      if (isLoggedIn()) {
+        console.log('Token exists, checking user data...');
+        const response = await getCurrentUser();
+        
+        console.log('Auth check response:', response);
+        
+        if (response.success && response.user) {
+          setCurrentUser(response.user);
+        } else {
+          console.error('Auth check failed:', response.error);
+          setError(response.error);
+          setCurrentUser(null);
+          
+          // If the error is authentication-related, clear the token
+          if (response.error && 
+              (response.error.includes('not authorized') || 
+                response.error.includes('token') || 
+                response.error.includes('authentication'))) {
+            logout();
+          }
         }
-      } finally {
-        setLoading(false);
+      } else {
+        console.log('No token found, user is not logged in');
+        setCurrentUser(null);
       }
-    };
+    } catch (err) {
+      console.error('Unexpected auth check error:', err);
+      setError('Authentication check failed');
+      setCurrentUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchUserData();
+  // Check auth status on mount
+  useEffect(() => {
+    console.log('AuthProvider mounted, checking auth status...');
+    checkAuthStatus();
   }, []);
 
-  const login = async (email, password) => {
-    setError('');
-    try {
-      const response = await axios.post('/auth/login', { email, password });
-      localStorage.setItem('token', response.data.token);
-      setCurrentUser(response.data.user);
-      return true;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-      return false;
-    }
-  };
-
-  const register = async (email, password) => {
-    setError('');
-    try {
-      await axios.post('/auth/register', { email, password });
-      return true;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
-      return false;
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
+  // Handle logout
+  const handleLogout = () => {
+    logout();
     setCurrentUser(null);
   };
 
+  // Context value
   const value = {
     currentUser,
     loading,
     error,
-    login,
-    register,
-    logout
+    setCurrentUser,
+    logout: handleLogout,
+    isAuthenticated: !!currentUser,
+    checkAuthStatus // Expose this to manually refresh auth status
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  console.log('AuthContext state:', { loading, isAuthenticated: !!currentUser });
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
+
+export default AuthProvider;

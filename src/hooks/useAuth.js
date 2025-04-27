@@ -1,127 +1,83 @@
-// hooks/useAuth.js
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import authApi from '../api/authApi';
+import { useState, useEffect, createContext, useContext } from 'react';
+import { getCurrentUser, logout, isLoggedIn } from '../api/authApi';
 
-/**
- * Custom hook for authentication state and operations
- * @returns {Object} Auth state and functions
- */
-export const useAuth = () => {
+// Create authentication context
+const AuthContext = createContext();
+
+// Auth provider component
+export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
+  // Check authentication status on mount and token change
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Only attempt to get user data if a token exists
+        if (isLoggedIn()) {
+          const response = await getCurrentUser();
+          
+          if (response.success && response.user) {
+            setCurrentUser(response.user);
+          } else {
+            // If API call fails but returns a structured error
+            console.error('Auth check failed:', response.error);
+            setError(response.error);
+            setCurrentUser(null);
+            
+            // If the error is authentication-related, clear the token
+            if (response.error && 
+                (response.error.includes('not authorized') || 
+                 response.error.includes('token') || 
+                 response.error.includes('authentication'))) {
+              logout();
+            }
+          }
+        } else {
+          // No token found
+          setCurrentUser(null);
+        }
+      } catch (err) {
+        // This catches unexpected errors (like network issues)
+        console.error('Unexpected auth check error:', err);
+        setError('Authentication check failed');
+        setCurrentUser(null);
+      } finally {
         setLoading(false);
-        return;
       }
-      
-      const response = await authApi.getCurrentUser();
-      
-      if (response.success) {
-        setCurrentUser(response.data);
-      } else {
-        // Clear token if invalid
-        localStorage.removeItem('token');
-      }
-      
-      setLoading(false);
     };
 
     checkAuthStatus();
   }, []);
 
-  const login = async (email, password) => {
-    setError('');
-    setLoading(true);
-    
-    const response = await authApi.login(email, password);
-    
-    setLoading(false);
-    
-    if (response.success) {
-      localStorage.setItem('token', response.data.token);
-      setCurrentUser(response.data.user);
-      navigate('/dashboard');
-      return true;
-    } else {
-      setError(response.error);
-      return false;
-    }
-  };
-
-  const register = async (email, password) => {
-    setError('');
-    setLoading(true);
-    
-    const response = await authApi.register(email, password);
-    
-    setLoading(false);
-    
-    if (response.success) {
-      return true;
-    } else {
-      setError(response.error);
-      return false;
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
+  // Logout function
+  const handleLogout = () => {
+    logout();
     setCurrentUser(null);
-    navigate('/');
   };
 
-  const updateProfile = async (userData) => {
-    setError('');
-    setLoading(true);
-    
-    const response = await authApi.updateProfile(userData);
-    
-    setLoading(false);
-    
-    if (response.success) {
-      setCurrentUser(response.data);
-      return true;
-    } else {
-      setError(response.error);
-      return false;
-    }
-  };
-
-  const resetPassword = async (email) => {
-    setError('');
-    setLoading(true);
-    
-    const response = await authApi.requestPasswordReset(email);
-    
-    setLoading(false);
-    
-    if (response.success) {
-      return true;
-    } else {
-      setError(response.error);
-      return false;
-    }
-  };
-
-  return {
+  // Context value
+  const value = {
     currentUser,
     loading,
     error,
-    login,
-    register,
-    logout,
-    updateProfile,
-    resetPassword,
-    isAuthenticated: !!currentUser
+    setCurrentUser,
+    logout: handleLogout,
+    isAuthenticated: !!currentUser,
   };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export default useAuth;
+// Custom hook to use auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
