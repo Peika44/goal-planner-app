@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/AuthContext';
+import { ToastProvider } from './components/ui/Toast';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
@@ -41,52 +42,54 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          
-          {/* Protected routes */}
-          <Route path="/dashboard" element={
-            <PrivateRoute>
-              <Layout>
-                <DashboardPage />
-              </Layout>
-            </PrivateRoute>
-          } />
-          
-          <Route path="/goals" element={
-            <PrivateRoute>
-              <Layout>
-                <GoalsPage />
-              </Layout>
-            </PrivateRoute>
-          } />
-          
-          <Route path="/goals/new" element={
-            <PrivateRoute>
-              <Layout>
-                <CreateGoalPage />
-              </Layout>
-            </PrivateRoute>
-          } />
-          
-          <Route path="/goals/:goalId" element={
-            <PrivateRoute>
-              <Layout>
-                <GoalDetailPage />
-              </Layout>
-            </PrivateRoute>
-          } />
-          
-          <Route path="/profile" element={
-            <PrivateRoute>
-              <Layout>
-                <ProfilePage />
-              </Layout>
-            </PrivateRoute>
-          } />
-        </Routes>
+        <ToastProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            
+            {/* Protected routes */}
+            <Route path="/dashboard" element={
+              <PrivateRoute>
+                <Layout>
+                  <DashboardPage />
+                </Layout>
+              </PrivateRoute>
+            } />
+            
+            <Route path="/goals" element={
+              <PrivateRoute>
+                <Layout>
+                  <GoalsPage />
+                </Layout>
+              </PrivateRoute>
+            } />
+            
+            <Route path="/goals/new" element={
+              <PrivateRoute>
+                <Layout>
+                  <CreateGoalPage />
+                </Layout>
+              </PrivateRoute>
+            } />
+            
+            <Route path="/goals/:goalId" element={
+              <PrivateRoute>
+                <Layout>
+                  <GoalDetailPage />
+                </Layout>
+              </PrivateRoute>
+            } />
+            
+            <Route path="/profile" element={
+              <PrivateRoute>
+                <Layout>
+                  <ProfilePage />
+                </Layout>
+              </PrivateRoute>
+            } />
+          </Routes>
+        </ToastProvider>
       </AuthProvider>
     </Router>
   );
