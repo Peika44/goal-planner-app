@@ -5,6 +5,7 @@ import { useAuth } from './context/AuthContext';
 import { ToastProvider } from './components/ui/Toast';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import GoalsPage from './pages/GoalsPage';
 import GoalDetailPage from './pages/GoalDetailPage';
@@ -31,7 +32,7 @@ const PrivateRoute = ({ children }) => {
   
   // Redirect to login if not authenticated
   if (!currentUser) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
   
   // Render the protected component
@@ -45,8 +46,10 @@ function App() {
         <ToastProvider>
           <Routes>
             {/* Public routes */}
-            <Route path="/" element={<LoginPage />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             
             {/* Protected routes */}
             <Route path="/dashboard" element={

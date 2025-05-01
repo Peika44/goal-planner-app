@@ -42,6 +42,8 @@ export const login = async (credentials) => {
   }
 };
 
+
+
 /**
  * Get the current user's data
  * @returns {Promise<Object>} Response object
