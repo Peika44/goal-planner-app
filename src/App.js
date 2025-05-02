@@ -53,11 +53,9 @@ function App() {
             
             {/* Protected routes */}
             <Route path="/dashboard" element={
-              <PrivateRoute>
-                <Layout>
-                  <DashboardPage />
-                </Layout>
-              </PrivateRoute>
+              // <PrivateRoute>
+                <DashboardPage />
+              // </PrivateRoute>
             } />
             
             <Route path="/goals" element={
