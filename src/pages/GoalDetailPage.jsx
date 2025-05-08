@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getGoalById, updateGoal, completeGoal, deleteGoal } from '../api/goalApi';
 import { getTasksByGoal, createTask, completeTask, deleteTask, generateTasks } from '../api/taskApi';
 
@@ -276,25 +276,44 @@ const GoalDetailPage = () => {
     }
   };
   
+  // Get today's date in YYYY-MM-DD format for date inputs
+  const today = new Date().toISOString().split('T')[0];
+  
   if (loading && !goal) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-xl">Loading goal details...</p>
+      <div className="dashboard-container">
+        <div className="dashboard-loading-center">
+          <div className="dashboard-loading-spinner"></div>
+          <p className="dashboard-loading-text">Loading goal details...</p>
+        </div>
       </div>
     );
   }
   
   if (error && !goal) {
     return (
-      <div className="p-6">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-          <p>{error}</p>
-          <button 
-            className="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-            onClick={() => navigate('/goals')}
-          >
-            Go back to goals
-          </button>
+      <div className="dashboard-container">
+        <div className="dashboard-header">
+          <h1 className="dashboard-title">Goal Details</h1>
+          <Link to="/goals" className="dashboard-button dashboard-button-small dashboard-button-secondary">
+            <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Back to Goals
+          </Link>
+        </div>
+        
+        <div className="dashboard-panel">
+          <div className="dashboard-alert dashboard-alert-error">
+            <div className="dashboard-alert-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path fillRule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm-1-7v-2h2v2h-2zm0-8v4h2V7h-2z" />
+              </svg>
+            </div>
+            <div className="dashboard-alert-content">
+              <h3 className="dashboard-alert-title">{error}</h3>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -302,96 +321,117 @@ const GoalDetailPage = () => {
   
   if (!goal) {
     return (
-      <div className="p-6">
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6">
-          <p>Goal not found</p>
-          <button 
-            className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-            onClick={() => navigate('/goals')}
-          >
-            Go back to goals
-          </button>
+      <div className="dashboard-container">
+        <div className="dashboard-header">
+          <h1 className="dashboard-title">Goal Details</h1>
+          <Link to="/goals" className="dashboard-button dashboard-button-small dashboard-button-secondary">
+            <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Back to Goals
+          </Link>
+        </div>
+        
+        <div className="dashboard-panel">
+          <div className="dashboard-alert dashboard-alert-warning">
+            <div className="dashboard-alert-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path fillRule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm-1-7v-2h2v2h-2zm0-8v4h2V7h-2z" />
+              </svg>
+            </div>
+            <div className="dashboard-alert-content">
+              <h3 className="dashboard-alert-title">Goal not found</h3>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      {/* Error notification */}
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-          <p>{error}</p>
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <div className="dashboard-header-title-group">
+          <Link to="/goals" className="dashboard-back-link">
+            <svg className="dashboard-back-icon" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            <span>Goals</span>
+          </Link>
+          <h1 className="dashboard-title">{goal.title}</h1>
         </div>
-      )}
-      
-      {/* Goal header */}
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">{goal.title}</h1>
-          <div className="flex items-center mt-2">
-            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-              goal.category === 'Personal' ? 'bg-purple-100 text-purple-800' :
-              goal.category === 'Professional' ? 'bg-blue-100 text-blue-800' :
-              goal.category === 'Health' ? 'bg-green-100 text-green-800' :
-              goal.category === 'Financial' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-gray-100 text-gray-800'
-            }`}>
-              {goal.category}
-            </span>
-            <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-              goal.priority === 'High' ? 'bg-red-100 text-red-800' :
-              goal.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-green-100 text-green-800'
-            }`}>
-              {goal.priority} Priority
-            </span>
-            <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-              goal.isCompleted ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-            }`}>
-              {goal.isCompleted ? 'Completed' : 'In Progress'}
-            </span>
-          </div>
-        </div>
-        <div className="flex space-x-2">
+        
+        <div className="dashboard-header-actions">
           <button
             onClick={() => setShowEditForm(!showEditForm)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+            className="dashboard-button dashboard-button-small dashboard-button-secondary"
           >
+            <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
             Edit
           </button>
+          
           {!goal.isCompleted && (
             <button
               onClick={handleCompleteGoal}
-              className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
+              className="dashboard-button dashboard-button-small dashboard-button-success"
             >
-              Mark Complete
+              <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 13l4 4L19 7" />
+              </svg>
+              Complete
             </button>
           )}
+          
           <button
             onClick={handleDeleteGoal}
-            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+            className="dashboard-button dashboard-button-small dashboard-button-danger"
           >
+            <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
             Delete
           </button>
         </div>
       </div>
       
+      {/* Error message */}
+      {error && (
+        <div className="dashboard-alert dashboard-alert-error">
+          <div className="dashboard-alert-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path fillRule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm-1-7v-2h2v2h-2zm0-8v4h2V7h-2z" />
+            </svg>
+          </div>
+          <div className="dashboard-alert-content">
+            <h3 className="dashboard-alert-title">{error}</h3>
+          </div>
+        </div>
+      )}
+      
       {/* Edit goal form */}
       {showEditForm && (
-        <div className="bg-white p-6 rounded-lg shadow mb-6">
-          <h2 className="text-xl font-semibold mb-4">Edit Goal</h2>
+        <div className="dashboard-panel dashboard-panel-form">
+          <h2 className="dashboard-panel-title">Edit Goal</h2>
           
           {editFormError && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              <p>{editFormError}</p>
+            <div className="dashboard-alert dashboard-alert-error">
+              <div className="dashboard-alert-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                  <path fillRule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm-1-7v-2h2v2h-2zm0-8v4h2V7h-2z" />
+                </svg>
+              </div>
+              <div className="dashboard-alert-content">
+                <h3 className="dashboard-alert-title">{editFormError}</h3>
+              </div>
             </div>
           )}
           
           <form onSubmit={handleEditFormSubmit}>
-            <div className="mb-4">
-              <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">
-                Goal Title *
+            <div className="dashboard-form-group">
+              <label htmlFor="title" className="dashboard-form-label">
+                Goal Title <span className="dashboard-form-required">*</span>
               </label>
               <input
                 type="text"
@@ -399,29 +439,29 @@ const GoalDetailPage = () => {
                 name="title"
                 value={editFormData.title}
                 onChange={handleEditFormChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="dashboard-form-input"
                 required
               />
             </div>
             
-            <div className="mb-4">
-              <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">
-                Description *
+            <div className="dashboard-form-group">
+              <label htmlFor="description" className="dashboard-form-label">
+                Description <span className="dashboard-form-required">*</span>
               </label>
               <textarea
                 id="description"
                 name="description"
                 value={editFormData.description}
                 onChange={handleEditFormChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="dashboard-form-input dashboard-form-textarea"
                 rows="4"
                 required
               />
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div>
-                <label htmlFor="category" className="block text-gray-700 text-sm font-bold mb-2">
+            <div className="dashboard-form-row">
+              <div className="dashboard-form-group">
+                <label htmlFor="category" className="dashboard-form-label">
                   Category
                 </label>
                 <select
@@ -429,7 +469,7 @@ const GoalDetailPage = () => {
                   name="category"
                   value={editFormData.category}
                   onChange={handleEditFormChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="dashboard-form-select"
                 >
                   <option value="Personal">Personal</option>
                   <option value="Professional">Professional</option>
@@ -440,8 +480,8 @@ const GoalDetailPage = () => {
                 </select>
               </div>
               
-              <div>
-                <label htmlFor="priority" className="block text-gray-700 text-sm font-bold mb-2">
+              <div className="dashboard-form-group">
+                <label htmlFor="priority" className="dashboard-form-label">
                   Priority
                 </label>
                 <select
@@ -449,7 +489,7 @@ const GoalDetailPage = () => {
                   name="priority"
                   value={editFormData.priority}
                   onChange={handleEditFormChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="dashboard-form-select"
                 >
                   <option value="Low">Low</option>
                   <option value="Medium">Medium</option>
@@ -457,9 +497,9 @@ const GoalDetailPage = () => {
                 </select>
               </div>
               
-              <div>
-                <label htmlFor="targetDate" className="block text-gray-700 text-sm font-bold mb-2">
-                  Target Date *
+              <div className="dashboard-form-group">
+                <label htmlFor="targetDate" className="dashboard-form-label">
+                  Target Date <span className="dashboard-form-required">*</span>
                 </label>
                 <input
                   type="date"
@@ -467,26 +507,37 @@ const GoalDetailPage = () => {
                   name="targetDate"
                   value={editFormData.targetDate}
                   onChange={handleEditFormChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="dashboard-form-input"
+                  min={today}
                   required
                 />
               </div>
             </div>
             
-            <div className="flex items-center justify-end">
+            <div className="dashboard-form-actions">
               <button
                 type="button"
                 onClick={() => setShowEditForm(false)}
-                className="mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="dashboard-button dashboard-button-secondary"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={editFormLoading}
-                className={`${editFormLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
+                className="dashboard-button"
               >
-                {editFormLoading ? 'Updating...' : 'Update Goal'}
+                {editFormLoading ? (
+                  <>
+                    <svg className="dashboard-icon dashboard-icon-spin" viewBox="0 0 24 24">
+                      <circle className="dashboard-icon-loader-bg" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"></circle>
+                      <path className="dashboard-icon-loader" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Updating...</span>
+                  </>
+                ) : (
+                  <span>Update Goal</span>
+                )}
               </button>
             </div>
           </form>
@@ -494,72 +545,123 @@ const GoalDetailPage = () => {
       )}
       
       {/* Goal details */}
-      <div className="bg-white p-6 rounded-lg shadow mb-6">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold mb-2">Description</h2>
-          <p className="text-gray-700">{goal.description}</p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-500">Target Date</h3>
-            <p>{formatDate(goal.targetDate)}</p>
+      <div className="dashboard-panel dashboard-goal-details">
+        <div className="dashboard-goal-meta">
+          <div className="dashboard-badges">
+            <span className={`dashboard-badge ${
+              goal.category === 'Personal' ? 'dashboard-badge-purple' :
+              goal.category === 'Professional' ? 'dashboard-badge-blue' :
+              goal.category === 'Health' ? 'dashboard-badge-green' :
+              goal.category === 'Financial' ? 'dashboard-badge-yellow' :
+              'dashboard-badge-gray'
+            }`}>
+              {goal.category}
+            </span>
+            <span className={`dashboard-badge ${
+              goal.priority === 'High' ? 'dashboard-badge-red' :
+              goal.priority === 'Medium' ? 'dashboard-badge-yellow' :
+              'dashboard-badge-green'
+            }`}>
+              {goal.priority} Priority
+            </span>
+            <span className={`dashboard-badge ${
+              goal.isCompleted ? 'dashboard-badge-green' : 'dashboard-badge-blue'
+            }`}>
+              {goal.isCompleted ? 'Completed' : 'In Progress'}
+            </span>
           </div>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-500">Progress</h3>
-            <div className="mt-1">
-              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-green-500"
-                  style={{ width: `${goal.progress}%` }}
-                ></div>
-              </div>
-              <p className="text-sm mt-1">{goal.progress}% complete</p>
+          
+          <p className="dashboard-goal-description">{goal.description}</p>
+          
+          <div className="dashboard-goal-stats">
+            <div className="dashboard-goal-stat">
+              <span className="dashboard-goal-stat-label">Target Date</span>
+              <span className="dashboard-goal-stat-value">{formatDate(goal.targetDate)}</span>
             </div>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-500">Created On</h3>
-            <p>{formatDate(goal.createdAt)}</p>
+            
+            <div className="dashboard-goal-stat">
+              <span className="dashboard-goal-stat-label">Created On</span>
+              <span className="dashboard-goal-stat-value">{formatDate(goal.createdAt)}</span>
+            </div>
+            
+            <div className="dashboard-goal-stat dashboard-goal-progress-stat">
+              <span className="dashboard-goal-stat-label">Progress</span>
+              <div className="dashboard-goal-progress">
+                <div className="dashboard-progress-bar">
+                  <div 
+                    className="dashboard-progress-value" 
+                    style={{ width: `${goal.progress}%` }}
+                    aria-label={`${goal.progress}% complete`}
+                  ></div>
+                </div>
+                <span className="dashboard-progress-text">{goal.progress}%</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       
       {/* Tasks section */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Tasks</h2>
-          <div className="flex space-x-2">
+      <div className="dashboard-panel dashboard-tasks-panel">
+        <div className="dashboard-panel-header">
+          <h2 className="dashboard-panel-title">Tasks</h2>
+          <div className="dashboard-panel-actions">
             <button
               onClick={handleGenerateTasks}
-              className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded text-sm"
+              className="dashboard-button dashboard-button-small dashboard-button-ai"
               disabled={loading}
             >
-              {loading ? 'Generating...' : 'Generate AI Tasks'}
+              {loading ? (
+                <>
+                  <svg className="dashboard-icon dashboard-icon-small dashboard-icon-spin" viewBox="0 0 24 24">
+                    <circle className="dashboard-icon-loader-bg" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"></circle>
+                    <path className="dashboard-icon-loader" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span>Generate AI Tasks</span>
+                </>
+              )}
             </button>
             <button
               onClick={() => setShowTaskForm(!showTaskForm)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+              className="dashboard-button dashboard-button-small"
             >
-              {showTaskForm ? 'Cancel' : 'Add Task'}
+              <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>{showTaskForm ? 'Cancel' : 'Add Task'}</span>
             </button>
           </div>
         </div>
         
         {/* Task creation form */}
         {showTaskForm && (
-          <div className="bg-gray-50 p-4 rounded mb-4">
-            <h3 className="text-lg font-semibold mb-2">Add New Task</h3>
+          <div className="dashboard-task-form">
+            <h3 className="dashboard-task-form-title">Add New Task</h3>
             
             {taskFormError && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <p>{taskFormError}</p>
+              <div className="dashboard-alert dashboard-alert-error">
+                <div className="dashboard-alert-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                    <path fillRule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm-1-7v-2h2v2h-2zm0-8v4h2V7h-2z" />
+                  </svg>
+                </div>
+                <div className="dashboard-alert-content">
+                  <h3 className="dashboard-alert-title">{taskFormError}</h3>
+                </div>
               </div>
             )}
             
             <form onSubmit={handleTaskFormSubmit}>
-              <div className="mb-4">
-                <label htmlFor="taskTitle" className="block text-gray-700 text-sm font-bold mb-2">
-                  Task Title *
+              <div className="dashboard-form-group">
+                <label htmlFor="taskTitle" className="dashboard-form-label">
+                  Task Title <span className="dashboard-form-required">*</span>
                 </label>
                 <input
                   type="text"
@@ -567,14 +669,14 @@ const GoalDetailPage = () => {
                   name="title"
                   value={taskFormData.title}
                   onChange={handleTaskFormChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="dashboard-form-input"
                   placeholder="What needs to be done?"
                   required
                 />
               </div>
               
-              <div className="mb-4">
-                <label htmlFor="taskDescription" className="block text-gray-700 text-sm font-bold mb-2">
+              <div className="dashboard-form-group">
+                <label htmlFor="taskDescription" className="dashboard-form-label">
                   Description
                 </label>
                 <textarea
@@ -582,16 +684,16 @@ const GoalDetailPage = () => {
                   name="description"
                   value={taskFormData.description}
                   onChange={handleTaskFormChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="dashboard-form-input dashboard-form-textarea"
                   placeholder="Additional details..."
                   rows="2"
                 />
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label htmlFor="taskDueDate" className="block text-gray-700 text-sm font-bold mb-2">
-                    Due Date *
+              <div className="dashboard-form-row">
+                <div className="dashboard-form-group">
+                  <label htmlFor="taskDueDate" className="dashboard-form-label">
+                    Due Date <span className="dashboard-form-required">*</span>
                   </label>
                   <input
                     type="date"
@@ -599,13 +701,14 @@ const GoalDetailPage = () => {
                     name="dueDate"
                     value={taskFormData.dueDate}
                     onChange={handleTaskFormChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="dashboard-form-input"
+                    min={today}
                     required
                   />
                 </div>
                 
-                <div>
-                  <label htmlFor="taskPriority" className="block text-gray-700 text-sm font-bold mb-2">
+                <div className="dashboard-form-group">
+                  <label htmlFor="taskPriority" className="dashboard-form-label">
                     Priority
                   </label>
                   <select
@@ -613,7 +716,7 @@ const GoalDetailPage = () => {
                     name="priority"
                     value={taskFormData.priority}
                     onChange={handleTaskFormChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="dashboard-form-select"
                   >
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
@@ -622,20 +725,30 @@ const GoalDetailPage = () => {
                 </div>
               </div>
               
-              <div className="flex items-center justify-end">
+              <div className="dashboard-form-actions">
                 <button
                   type="button"
                   onClick={() => setShowTaskForm(false)}
-                  className="mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  className="dashboard-button dashboard-button-secondary"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={taskFormLoading}
-                  className={`${taskFormLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
+                  className="dashboard-button"
                 >
-                  {taskFormLoading ? 'Adding...' : 'Add Task'}
+                  {taskFormLoading ? (
+                    <>
+                      <svg className="dashboard-icon dashboard-icon-spin" viewBox="0 0 24 24">
+                        <circle className="dashboard-icon-loader-bg" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"></circle>
+                        <path className="dashboard-icon-loader" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Adding...</span>
+                    </>
+                  ) : (
+                    <span>Add Task</span>
+                  )}
                 </button>
               </div>
             </form>
@@ -644,57 +757,70 @@ const GoalDetailPage = () => {
         
         {/* Tasks list */}
         {loading ? (
-          <p className="text-center py-4">Loading tasks...</p>
+          <div className="dashboard-loading">
+            <div className="dashboard-loading-spinner"></div>
+            <p className="dashboard-loading-text">Loading tasks...</p>
+          </div>
         ) : tasks.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p>No tasks yet for this goal.</p>
-            <p className="mt-2">Add tasks to break down your goal into manageable steps.</p>
+          <div className="dashboard-empty-state">
+            <svg className="dashboard-empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <h3 className="dashboard-empty-state-title">No tasks yet</h3>
+            <p className="dashboard-empty-state-message">Add tasks to break down your goal into manageable steps</p>
+            <button 
+              onClick={() => setShowTaskForm(true)}
+              className="dashboard-button dashboard-button-small"
+            >
+              <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Add First Task</span>
+            </button>
           </div>
         ) : (
-          <ul className="divide-y divide-gray-200">
+          <ul className="dashboard-tasks-list">
             {tasks.map(task => (
-              <li key={task._id} className="py-4">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 mt-1">
-                    <input
-                      type="checkbox"
-                      checked={task.isCompleted}
-                      onChange={() => handleToggleTaskCompletion(task._id)}
-                      className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="ml-3 flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className={`text-sm font-medium ${task.isCompleted ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
-                        {task.title}
-                      </p>
-                      <div className="flex items-center">
-                        <span className={`px-2 py-1 text-xs rounded ${
-                          task.priority === 'High' ? 'bg-red-100 text-red-800' :
-                          task.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
-                        }`}>
-                          {task.priority}
-                        </span>
-                        <button
-                          onClick={() => handleDeleteTask(task._id)}
-                          className="ml-2 text-red-500 hover:text-red-700"
-                          title="Delete task"
-                        >
-                          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                    {task.description && (
-                      <p className="text-sm text-gray-500 mt-1">{task.description}</p>
-                    )}
-                    <p className="text-xs text-gray-500 mt-1">
+              <li key={task._id} className={`dashboard-task-item ${task.isCompleted ? 'dashboard-task-completed' : ''}`}>
+                <div className="dashboard-task-checkbox">
+                  <input
+                    type="checkbox"
+                    id={`task-${task._id}`}
+                    checked={task.isCompleted}
+                    onChange={() => handleToggleTaskCompletion(task._id)}
+                    className="dashboard-checkbox"
+                  />
+                  <label htmlFor={`task-${task._id}`} className="dashboard-checkbox-label"></label>
+                </div>
+                <div className="dashboard-task-content">
+                  <h3 className={`dashboard-task-title ${task.isCompleted ? 'dashboard-task-title-completed' : ''}`}>
+                    {task.title}
+                  </h3>
+                  {task.description && (
+                    <p className="dashboard-task-description">{task.description}</p>
+                  )}
+                  <div className="dashboard-task-meta">
+                    <span className="dashboard-task-due-date">
                       Due: {formatDate(task.dueDate)}
-                    </p>
+                    </span>
+                    <span className={`dashboard-badge ${
+                      task.priority === 'High' ? 'dashboard-badge-red' :
+                      task.priority === 'Medium' ? 'dashboard-badge-yellow' :
+                      'dashboard-badge-green'
+                    }`}>
+                      {task.priority}
+                    </span>
                   </div>
                 </div>
+                <button
+                  onClick={() => handleDeleteTask(task._id)}
+                  className="dashboard-task-delete"
+                  aria-label="Delete task"
+                >
+                  <svg className="dashboard-task-delete-icon" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </li>
             ))}
           </ul>

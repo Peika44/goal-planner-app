@@ -67,25 +67,19 @@ function App() {
             
             <Route path="/goals/new" element={
               <PrivateRoute>
-  
                   <CreateGoalPage />
-
               </PrivateRoute>
             } />
             
             <Route path="/goals/:goalId" element={
               <PrivateRoute>
-
                   <GoalDetailPage />
- 
               </PrivateRoute>
             } />
             
             <Route path="/profile" element={
               <PrivateRoute>
-
                   <ProfilePage />
-
               </PrivateRoute>
             } />
           </Routes>

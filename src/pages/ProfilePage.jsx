@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { updateProfile } from '../api/authApi';
+import { Link } from 'react-router-dom';
 
 const ProfilePage = () => {
   const { currentUser, setCurrentUser } = useAuth();
@@ -74,121 +75,172 @@ const ProfilePage = () => {
   };
   
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">Profile Settings</h1>
+        <Link to="/dashboard" className="dashboard-button dashboard-button-small">
+          <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          Back to Dashboard
+        </Link>
+      </div>
       
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          <p>{error}</p>
-        </div>
-      )}
-      
-      {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          <p>{success}</p>
-        </div>
-      )}
-      
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl">
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                First Name
-              </label>
-              <input
-                type="text"
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className="p-2 border border-gray-300 rounded-md w-full"
-              />
+      {/* Content Panel with frosted glass effect */}
+      <div className="dashboard-panel">
+        {error && (
+          <div className="dashboard-alert dashboard-alert-error">
+            <div className="dashboard-alert-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path fillRule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm-1-7v-2h2v2h-2zm0-8v4h2V7h-2z" />
+              </svg>
+            </div>
+            <div className="dashboard-alert-content">
+              <h3 className="dashboard-alert-title">{error}</h3>
+            </div>
+          </div>
+        )}
+        
+        {success && (
+          <div className="dashboard-alert dashboard-alert-success">
+            <div className="dashboard-alert-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path fillRule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm-1.5-6.5l-4-4 1.41-1.41L11 13.17l5.18-5.17 1.41 1.41-7.09 7.09z" />
+              </svg>
+            </div>
+            <div className="dashboard-alert-content">
+              <h3 className="dashboard-alert-title">{success}</h3>
+            </div>
+          </div>
+        )}
+        
+        <div className="dashboard-profile-form">
+          <form onSubmit={handleSubmit}>
+            <div className="dashboard-profile-section">
+              <h2 className="dashboard-profile-section-title">Personal Information</h2>
+              
+              <div className="dashboard-profile-grid">
+                <div className="dashboard-form-group">
+                  <label htmlFor="firstName" className="dashboard-form-label">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="dashboard-form-input"
+                  />
+                </div>
+                
+                <div className="dashboard-form-group">
+                  <label htmlFor="lastName" className="dashboard-form-label">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="dashboard-form-input"
+                  />
+                </div>
+              </div>
             </div>
             
-            <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                Last Name
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                className="p-2 border border-gray-300 rounded-md w-full"
-              />
+            <div className="dashboard-profile-section">
+              <h2 className="dashboard-profile-section-title">Account Details</h2>
+              
+              <div className="dashboard-form-group">
+                <label htmlFor="username" className="dashboard-form-label">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="dashboard-form-input"
+                  required
+                />
+              </div>
+              
+              <div className="dashboard-form-group">
+                <label htmlFor="email" className="dashboard-form-label">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="dashboard-form-input"
+                  required
+                />
+              </div>
             </div>
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-md w-full"
-              required
-            />
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-md w-full"
-              required
-            />
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              New Password (leave blank to keep current)
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-md w-full"
-            />
-          </div>
-          
-          <div className="mb-6">
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm New Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-md w-full"
-            />
-          </div>
-          
-          <div className="text-right">
-            <button
-              type="submit"
-              disabled={loading}
-              className={`${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white font-medium py-2 px-4 rounded-md`}
-            >
-              {loading ? 'Updating...' : 'Update Profile'}
-            </button>
-          </div>
-        </form>
+            
+            <div className="dashboard-profile-section">
+              <h2 className="dashboard-profile-section-title">Security</h2>
+              
+              <div className="dashboard-form-group">
+                <label htmlFor="password" className="dashboard-form-label">
+                  New Password <span className="dashboard-form-optional">(leave blank to keep current)</span>
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="dashboard-form-input"
+                />
+              </div>
+              
+              <div className="dashboard-form-group">
+                <label htmlFor="confirmPassword" className="dashboard-form-label">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="dashboard-form-input"
+                />
+              </div>
+            </div>
+            
+            <div className="dashboard-form-actions">
+              <Link to="/dashboard" className="dashboard-button dashboard-button-secondary">
+                Cancel
+              </Link>
+              
+              <button
+                type="submit"
+                disabled={loading}
+                className="dashboard-button"
+              >
+                {loading ? (
+                  <>
+                    <svg className="dashboard-icon dashboard-icon-spin" viewBox="0 0 24 24">
+                      <circle className="dashboard-icon-loader-bg" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"></circle>
+                      <path className="dashboard-icon-loader" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Updating...</span>
+                  </>
+                ) : (
+                  <span>Update Profile</span>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

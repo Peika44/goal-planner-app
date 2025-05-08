@@ -110,34 +110,24 @@ const GoalsPage = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Get category badge color
-  const getCategoryColor = (category) => {
-    switch (category) {
-      case 'Personal':
-        return 'bg-purple-100 text-purple-800';
-      case 'Professional':
-        return 'bg-blue-100 text-blue-800';
-      case 'Health':
-        return 'bg-green-100 text-green-800';
-      case 'Financial':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Educational':
-        return 'bg-indigo-100 text-indigo-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
-    <div className="p-6">
-      <div className="flex flex-wrap justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Goals</h1>
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <div className="dashboard-header-title-group">
+          <Link to="/dashboard" className="dashboard-back-link">
+            <svg className="dashboard-back-icon" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            <span>Dashboard</span>
+          </Link>
+          <h1 className="dashboard-title">My Goals</h1>
+        </div>
         <Link
           to="/goals/new"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+          className="dashboard-button"
         >
-          <svg className="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          <svg className="dashboard-icon" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v16m8-8H4" />
           </svg>
           New Goal
         </Link>
@@ -145,23 +135,30 @@ const GoalsPage = () => {
       
       {/* Error display */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-          <p>{error}</p>
+        <div className="dashboard-alert dashboard-alert-error">
+          <div className="dashboard-alert-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path fillRule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm-1-7v-2h2v2h-2zm0-8v4h2V7h-2z" />
+            </svg>
+          </div>
+          <div className="dashboard-alert-content">
+            <h3 className="dashboard-alert-title">{error}</h3>
+          </div>
         </div>
       )}
       
       {/* Filters and search */}
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <div className="md:flex justify-between">
-          <div className="mb-4 md:mb-0">
-            <label htmlFor="filter" className="block text-sm font-medium text-gray-700 mb-1">
+      <div className="dashboard-panel dashboard-filters-panel">
+        <div className="dashboard-filters">
+          <div className="dashboard-filter-group">
+            <label htmlFor="filter" className="dashboard-filter-label">
               Filter by:
             </label>
             <select
               id="filter"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="p-2 border border-gray-300 rounded-md w-full md:w-auto"
+              className="dashboard-form-select"
             >
               <option value="all">All Goals</option>
               <option value="active">Active Goals</option>
@@ -175,117 +172,147 @@ const GoalsPage = () => {
             </select>
           </div>
           
-          <div>
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="dashboard-filter-group">
+            <label htmlFor="search" className="dashboard-filter-label">
               Search goals:
             </label>
-            <input
-              type="text"
-              id="search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by title or description"
-              className="p-2 border border-gray-300 rounded-md w-full"
-            />
+            <div className="dashboard-search-input-wrapper">
+              <svg className="dashboard-search-icon" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                id="search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by title or description"
+                className="dashboard-search-input"
+              />
+              {searchTerm && (
+                <button 
+                  onClick={() => setSearchTerm('')}
+                  className="dashboard-search-clear"
+                  aria-label="Clear search"
+                >
+                  <svg viewBox="0 0 24 24" className="dashboard-search-clear-icon">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
       
       {/* Goals list */}
-      {loading ? (
-        <div className="text-center py-10">
-          <p className="text-xl">Loading goals...</p>
-        </div>
-      ) : filteredGoals.length === 0 ? (
-        <div className="bg-white p-6 rounded-lg shadow text-center">
-          <p className="text-lg text-gray-500 mb-4">
-            {searchTerm
-              ? 'No goals match your search criteria'
-              : filter !== 'all'
-              ? 'No goals match the selected filter'
-              : 'You have not created any goals yet'}
-          </p>
-          <Link
-            to="/goals/new"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-          >
-            Create your first goal
-          </Link>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <ul className="divide-y divide-gray-200">
+      <div className="dashboard-panel dashboard-goals-panel">
+        {loading ? (
+          <div className="dashboard-loading-center">
+            <div className="dashboard-loading-spinner"></div>
+            <p className="dashboard-loading-text">Loading goals...</p>
+          </div>
+        ) : filteredGoals.length === 0 ? (
+          <div className="dashboard-empty-state">
+            <svg className="dashboard-empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <h3 className="dashboard-empty-state-title">
+              {searchTerm
+                ? 'No goals match your search criteria'
+                : filter !== 'all'
+                ? 'No goals match the selected filter'
+                : 'You have not created any goals yet'}
+            </h3>
+            <p className="dashboard-empty-state-message">
+              {searchTerm || filter !== 'all' 
+                ? 'Try changing your filters or create a new goal'
+                : 'Goals help you organize your tasks and track your progress'}
+            </p>
+            <Link
+              to="/goals/new"
+              className="dashboard-button dashboard-button-small"
+            >
+              <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v16m8-8H4" />
+              </svg>
+              Create your first goal
+            </Link>
+          </div>
+        ) : (
+          <ul className="dashboard-goals-list">
             {filteredGoals.map(goal => (
-              <li key={goal._id} className="hover:bg-gray-50">
-                <Link to={`/goals/${goal._id}`} className="block">
-                  <div className="px-6 py-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center">
-                          <h3 className={`text-lg font-medium ${goal.isCompleted ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
-                            {goal.title}
-                          </h3>
-                          <span className={`ml-2 px-2 py-1 text-xs rounded-full ${getCategoryColor(goal.category)}`}>
+              <li key={goal._id} className="dashboard-goals-list-item">
+                <Link to={`/goals/${goal._id}`} className="dashboard-goal-link">
+                  <div className="dashboard-goal-card-content">
+                    <div className="dashboard-goal-main">
+                      <div className="dashboard-goal-header">
+                        <h3 className={`dashboard-goal-title ${goal.isCompleted ? 'dashboard-goal-title-completed' : ''}`}>
+                          {goal.title}
+                        </h3>
+                        <div className="dashboard-goal-badges">
+                          <span className={`dashboard-badge ${
+                            goal.category === 'Personal' ? 'dashboard-badge-purple' :
+                            goal.category === 'Professional' ? 'dashboard-badge-blue' :
+                            goal.category === 'Health' ? 'dashboard-badge-green' :
+                            goal.category === 'Financial' ? 'dashboard-badge-yellow' :
+                            'dashboard-badge-gray'
+                          }`}>
                             {goal.category}
                           </span>
                           {goal.isCompleted && (
-                            <span className="ml-2 px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            <span className="dashboard-badge dashboard-badge-green">
                               Completed
                             </span>
                           )}
                         </div>
-                        
-                        <p className="mt-1 text-sm text-gray-500 line-clamp-2">
-                          {goal.description}
-                        </p>
-                        
-                        <div className="mt-2 flex items-center text-xs text-gray-500">
-                          <span>Target: {formatDate(goal.targetDate)}</span>
-                          <span className="mx-2">•</span>
-                          <span className={`${
-                            goal.priority === 'High' ? 'text-red-600' :
-                            goal.priority === 'Medium' ? 'text-yellow-600' :
-                            'text-green-600'
-                          }`}>
-                            {goal.priority} Priority
-                          </span>
-                        </div>
                       </div>
                       
-                      <div className="ml-4 flex-shrink-0 flex items-center">
-                        <div className="mr-4 w-16">
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-green-500"
-                              style={{ width: `${goal.progress}%` }}
-                            ></div>
-                          </div>
-                          <p className="text-xs text-gray-500 text-right mt-1">{goal.progress}%</p>
+                      <p className="dashboard-goal-description">
+                        {goal.description}
+                      </p>
+                      
+                      <div className="dashboard-goal-info">
+                        <span className="dashboard-goal-date">Target: {formatDate(goal.targetDate)}</span>
+                        <span className="dashboard-goal-separator">•</span>
+                        <span className={`dashboard-goal-priority dashboard-goal-priority-${goal.priority.toLowerCase()}`}>
+                          {goal.priority} Priority
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="dashboard-goal-side">
+                      <div className="dashboard-goal-progress-container">
+                        <div className="dashboard-progress-bar">
+                          <div 
+                            className="dashboard-progress-value" 
+                            style={{ width: `${goal.progress}%` }} 
+                          ></div>
                         </div>
-                        
-                        <div className="flex space-x-2">
-                          {!goal.isCompleted && (
-                            <button
-                              onClick={(e) => handleCompleteGoal(goal._id, e)}
-                              className="text-green-600 hover:text-green-900"
-                              title="Mark as complete"
-                            >
-                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                              </svg>
-                            </button>
-                          )}
-                          
+                        <span className="dashboard-progress-text">{goal.progress}%</span>
+                      </div>
+                      
+                      <div className="dashboard-goal-actions">
+                        {!goal.isCompleted && (
                           <button
-                            onClick={(e) => handleDeleteGoal(goal._id, e)}
-                            className="text-red-600 hover:text-red-900"
-                            title="Delete goal"
+                            onClick={(e) => handleCompleteGoal(goal._id, e)}
+                            className="dashboard-goal-action-button dashboard-goal-complete-button"
+                            title="Mark as complete"
                           >
-                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <svg className="dashboard-goal-action-icon" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 13l4 4L19 7" />
                             </svg>
                           </button>
-                        </div>
+                        )}
+                        
+                        <button
+                          onClick={(e) => handleDeleteGoal(goal._id, e)}
+                          className="dashboard-goal-action-button dashboard-goal-delete-button"
+                          title="Delete goal"
+                        >
+                          <svg className="dashboard-goal-action-icon" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -293,8 +320,8 @@ const GoalsPage = () => {
               </li>
             ))}
           </ul>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
