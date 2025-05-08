@@ -1,3 +1,15 @@
+@import "tailwindcss";
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+@theme {
+  /* Your design tokens */
+  --spacing: 0.25rem;
+  --font-sans: "Inter", sans-serif;
+  /* Add other custom values */
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

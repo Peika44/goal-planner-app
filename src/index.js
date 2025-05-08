@@ -1,14 +1,15 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client'; // Use `react-dom/client` in React 18+
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import { BrowserRouter } from 'react-router-dom'; 
+import './index.css'; // Import your CSS file here
 
-// Create root element for React 18+
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
-
-// Render your app
 root.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
+  <React.StrictMode>
+    {/* <BrowserRouter> */}
+      <App />
+    {/* </BrowserRouter> */}
+  </React.StrictMode>
 );
