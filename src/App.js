@@ -11,7 +11,7 @@ import GoalsPage from './pages/GoalsPage';
 import GoalDetailPage from './pages/GoalDetailPage';
 import CreateGoalPage from './pages/CreateGoalPage';
 import ProfilePage from './pages/ProfilePage';
-import Layout from './components/layout/Layout';
+import LogoutPage from './pages/LogoutPage';
 
 // Private route component
 const PrivateRoute = ({ children }) => {
@@ -50,43 +50,42 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            
+            <Route path="/logout" element={<LogoutPage />} />
+
             {/* Protected routes */}
             <Route path="/dashboard" element={
-              // <PrivateRoute>
-                <DashboardPage />
-              // </PrivateRoute>
+              <PrivateRoute>
+                  <DashboardPage />
+              </PrivateRoute>
             } />
             
             <Route path="/goals" element={
               <PrivateRoute>
-                <Layout>
                   <GoalsPage />
-                </Layout>
               </PrivateRoute>
             } />
             
             <Route path="/goals/new" element={
               <PrivateRoute>
-                <Layout>
+  
                   <CreateGoalPage />
-                </Layout>
+
               </PrivateRoute>
             } />
             
             <Route path="/goals/:goalId" element={
               <PrivateRoute>
-                <Layout>
+
                   <GoalDetailPage />
-                </Layout>
+ 
               </PrivateRoute>
             } />
             
             <Route path="/profile" element={
               <PrivateRoute>
-                <Layout>
+
                   <ProfilePage />
-                </Layout>
+
               </PrivateRoute>
             } />
           </Routes>

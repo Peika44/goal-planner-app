@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllGoals } from '../api/goalApi';
 import { getTodayTasks, completeTask } from '../api/taskApi';
@@ -10,7 +10,7 @@ import {
 } from '../components/loaders/SkeletonLoaders';
 import { NoGoalsEmptyState, NoTasksEmptyState } from '../components/ui/EmptyState';
 import ErrorDisplay from '../components/ui/ErrorDisplay';
-import './DashboardPage.css'; // Energetic, colorful styling
+import './DashboardPage.css'; // Apple-style elegant styling
 
 const DashboardPage = () => {
   const [goals, setGoals] = useState([]);
@@ -19,7 +19,9 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState({ goals: true, tasks: true });
   const [error, setError] = useState({ goals: null, tasks: null });
   const [refreshing, setRefreshing] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   
+  const profileMenuRef = useRef(null);
   const toast = useToast();
 
   // Load dashboard data
@@ -86,6 +88,25 @@ const DashboardPage = () => {
       setRefreshing(false);
     }
   };
+  
+  // Toggle profile menu
+  const toggleProfileMenu = () => {
+    setProfileMenuOpen(!profileMenuOpen);
+  };
+  
+  // Close profile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Calculate dashboard stats
   const stats = {
@@ -156,32 +177,86 @@ const DashboardPage = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  // Check if there are overdue tasks
+  const hasOverdueTasks = todayTasks.some(task => {
+    const taskDate = new Date(task.dueDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return !task.isCompleted && taskDate < today;
+  });
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h1 className="dashboard-title">Dashboard</h1>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="dashboard-button dashboard-refresh-button"
-        >
-          {refreshing ? (
-            <>
-              <svg className="dashboard-icon dashboard-icon-spin" viewBox="0 0 24 24">
-                <circle className="dashboard-icon-loader-bg" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="dashboard-icon-loader" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        <div className="dashboard-actions">
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="dashboard-button dashboard-refresh-button"
+            aria-label={refreshing ? "Refreshing data" : "Refresh data"}
+          >
+            {refreshing ? (
+              <>
+                <svg className="dashboard-icon dashboard-icon-spin" viewBox="0 0 24 24">
+                  <circle className="dashboard-icon-loader-bg" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"></circle>
+                  <path className="dashboard-icon-loader" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Refreshing</span>
+              </>
+            ) : (
+              <>
+                <svg className="dashboard-icon" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Refresh</span>
+              </>
+            )}
+          </button>
+          
+          <div className="dashboard-profile" ref={profileMenuRef}>
+            <button 
+              className="dashboard-profile-button" 
+              onClick={toggleProfileMenu}
+              aria-label="Open profile menu"
+              aria-expanded={profileMenuOpen}
+            >
+              <svg className="dashboard-profile-icon" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
               </svg>
-              <span>Refreshing...</span>
-            </>
-          ) : (
-            <>
-              <svg className="dashboard-icon" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span>Refresh</span>
-            </>
-          )}
-        </button>
+            </button>
+            
+            {profileMenuOpen && (
+              <div className="dashboard-profile-menu">
+                <Link to="/profile" className="dashboard-profile-menu-item">
+                  <svg viewBox="0 0 24 24" className="dashboard-profile-menu-icon">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                  </svg>
+                  View Profile
+                </Link>
+                <Link to="/settings" className="dashboard-profile-menu-item">
+                  <svg viewBox="0 0 24 24" className="dashboard-profile-menu-icon">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+                  </svg>
+                  Settings
+                </Link>
+                <Link to="/help" className="dashboard-profile-menu-item">
+                  <svg viewBox="0 0 24 24" className="dashboard-profile-menu-icon">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
+                  </svg>
+                  Help
+                </Link>
+                <div className="dashboard-profile-menu-divider"></div>
+                <Link to="/logout" className="dashboard-profile-menu-item">
+                  <svg viewBox="0 0 24 24" className="dashboard-profile-menu-icon">
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+                  </svg>
+                  Logout
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
       
       {/* Tab Navigation */}
@@ -273,12 +348,7 @@ const DashboardPage = () => {
             )}
             
             {/* Overdue Tasks Alert */}
-            {todayTasks.some(task => {
-              const taskDate = new Date(task.dueDate);
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              return !task.isCompleted && taskDate < today;
-            }) && (
+            {hasOverdueTasks && (
               <div className="dashboard-alert dashboard-alert-overdue">
                 <div className="dashboard-alert-icon">
                   <svg viewBox="0 0 20 20" fill="currentColor">
@@ -431,8 +501,7 @@ const DashboardPage = () => {
           <div className="dashboard-goals-content">
             {loading.goals ? (
               <div className="dashboard-loading">
-                <div className="dashboard-loading-indicator"></div>
-                <SkeletonGoalList />
+                <div className="dashboard-loading-spinner"></div>
               </div>
             ) : error.goals ? (
               <ErrorDisplay 
@@ -498,7 +567,11 @@ const DashboardPage = () => {
                       </p>
                       <div className="dashboard-goal-card-progress">
                         <div className="dashboard-progress-bar">
-                          <div className="dashboard-progress-value" style={{ width: `${goal.progress}%` }}></div>
+                          <div 
+                            className="dashboard-progress-value" 
+                            style={{ width: `${goal.progress}%` }}
+                            aria-label={`${goal.progress}% complete`}
+                          ></div>
                         </div>
                         <div className="dashboard-progress-text">{goal.progress}%</div>
                       </div>
@@ -514,7 +587,7 @@ const DashboardPage = () => {
           <div className="dashboard-tasks-content">
             {loading.tasks ? (
               <div className="dashboard-loading">
-                <div className="dashboard-loading-indicator"></div>
+                <div className="dashboard-loading-spinner"></div>
               </div>
             ) : error.tasks ? (
               <ErrorDisplay 
@@ -532,14 +605,15 @@ const DashboardPage = () => {
                     <span className="dashboard-task-count">
                       {todayTasks.filter(t => t.isCompleted).length} of {todayTasks.length} completed
                     </span>
-                    <div className="dashboard-task-progress">
+                    <div className="dashboard-progress-bar" style={{ width: '120px', marginLeft: '10px' }}>
                       <div 
-                        className="dashboard-task-progress-value" 
+                        className="dashboard-progress-value" 
                         style={{ 
                           width: `${todayTasks.length > 0 
                             ? Math.round((todayTasks.filter(t => t.isCompleted).length / todayTasks.length) * 100) 
                             : 0}%` 
                         }}
+                        aria-label={`${Math.round((todayTasks.filter(t => t.isCompleted).length / todayTasks.length) * 100)}% complete`}
                       ></div>
                     </div>
                   </div>
@@ -547,7 +621,7 @@ const DashboardPage = () => {
                 
                 <div className="dashboard-detailed-task-list">
                   {todayTasks.map(task => (
-                    <div key={task._id} className="dashboard-detailed-task-item">
+                    <div key={task._id} className="dashboard-task-item dashboard-detailed-task-item">
                       <div className="dashboard-task-checkbox">
                         <input
                           type="checkbox"
@@ -559,15 +633,15 @@ const DashboardPage = () => {
                         <label htmlFor={`detailed-task-${task._id}`} className="dashboard-checkbox-label"></label>
                       </div>
                       <div className="dashboard-detailed-task-content">
-                        <p className={`dashboard-detailed-task-title ${task.isCompleted ? 'dashboard-task-completed' : ''}`}>
+                        <p className={`dashboard-task-title ${task.isCompleted ? 'dashboard-task-completed' : ''}`}>
                           {task.title}
                         </p>
                         {task.description && (
-                          <p className="dashboard-detailed-task-description">
+                          <p className="dashboard-task-description">
                             {task.description}
                           </p>
                         )}
-                        <div className="dashboard-detailed-task-meta">
+                        <div className="dashboard-task-meta">
                           {task.goal && typeof task.goal === 'object' && (
                             <span className="dashboard-task-goal">
                               Goal: {task.goal.title}
@@ -581,21 +655,6 @@ const DashboardPage = () => {
                             {task.priority}
                           </span>
                         </div>
-                      </div>
-                      <div className="dashboard-task-actions">
-                        <button
-                          onClick={() => handleCompleteTask(task._id)}
-                          className="dashboard-task-action-button"
-                          title={task.isCompleted ? "Mark as incomplete" : "Mark as complete"}
-                        >
-                          <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24" width={4} height={4}>
-                            {task.isCompleted ? (
-                              <path d="M5 13l4 4L19 7" />
-                            ) : (
-                              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            )}
-                          </svg>
-                        </button>
                       </div>
                     </div>
                   ))}
