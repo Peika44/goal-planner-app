@@ -1,0 +1,743 @@
+/* RecommendationEngine.css */
+.recommendation-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+  
+  .recommendation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .recommendation-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+  }
+  
+  .recommendation-refresh-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background-color: #f5f5f7;
+    border: none;
+    border-radius: 0.5rem;
+    color: #0066cc;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .recommendation-refresh-button:hover {
+    background-color: #e8e8ed;
+  }
+  
+  .recommendation-refresh-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .recommendation-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  
+  .recommendation-icon-spin {
+    animation: icon-spin 1s linear infinite;
+  }
+  
+  @keyframes icon-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Input Controls */
+  .recommendation-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: #f5f5f7;
+    border-radius: 1rem;
+  }
+  
+  .recommendation-input-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .recommendation-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .recommendation-select-wrapper {
+    position: relative;
+  }
+  
+  .recommendation-select-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    pointer-events: none;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-right: 2px solid #777;
+    border-bottom: 2px solid #777;
+    transform: translateY(-65%) rotate(45deg);
+  }
+  
+  .recommendation-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    background-color: white;
+    font-size: 1rem;
+    color: #333;
+    appearance: none;
+  }
+  
+  .recommendation-select:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+  }
+  
+  /* Recommendation Content */
+  .recommendation-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .recommendation-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .recommendation-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .recommendation-section-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+  }
+  
+  .recommendation-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+  
+  .recommendation-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background-color: white;
+    border: 1px solid #e6e6e6;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .recommendation-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+  
+  .recommendation-card-selected {
+    border: 2px solid #0066cc;
+  }
+  
+  .recommendation-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 0.75rem 0;
+  }
+  
+  .recommendation-card-description {
+    font-size: 0.95rem;
+    color: #555;
+    margin: 0 0 1rem 0;
+    flex-grow: 1;
+  }
+  
+  .recommendation-card-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .recommendation-badge {
+    padding: 0.25rem 0.5rem;
+    background-color: #f2f2f2;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .recommendation-badge-easy {
+    background-color: #e6f7ee;
+    color: #00a06d;
+  }
+  
+  .recommendation-badge-medium {
+    background-color: #fff2e6;
+    color: #ff9500;
+  }
+  
+  .recommendation-badge-hard {
+    background-color: #ffebee;
+    color: #ff3b30;
+  }
+  
+  .recommendation-badge-selected {
+    background-color: #e6f2ff;
+    color: #0066cc;
+  }
+  
+  .recommendation-source {
+    font-size: 0.85rem;
+    color: #777;
+  }
+  
+  .recommendation-card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .recommendation-button {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .recommendation-button-primary {
+    background-color: #0066cc;
+    color: white;
+  }
+  
+  .recommendation-button-primary:hover {
+    background-color: #0055aa;
+  }
+  
+  .recommendation-button-primary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .recommendation-button-secondary {
+    background-color: transparent;
+    color: #0066cc;
+    border: 1px solid #ddd;
+  }
+  
+  .recommendation-button-secondary:hover {
+    background-color: #f5f5f7;
+  }
+  
+  .recommendation-feedback {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .recommendation-feedback-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 50%;
+    background-color: transparent;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .recommendation-feedback-button:hover {
+    background-color: #f5f5f7;
+    color: #0066cc;
+  }
+  
+  .recommendation-feedback-button:first-child:hover {
+    color: #ff2d55;
+  }
+  
+  .recommendation-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: currentColor;
+    stroke: none;
+  }
+  
+  /* Loading States */
+  .recommendation-loading,
+  .recommendation-cards-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .recommendation-loading {
+    min-height: 40vh;
+  }
+  
+  .recommendation-cards-loading {
+    min-height: 200px;
+  }
+  
+  .recommendation-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(0, 102, 204, 0.2);
+    border-top-color: #0066cc;
+    border-radius: 50%;
+    animation: spinner-rotation 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  @keyframes spinner-rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Error States */
+  .recommendation-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 40vh;
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .recommendation-error-icon {
+    width: 48px;
+    height: 48px;
+    color: #ff3b30;
+    margin-bottom: 1rem;
+  }
+  
+  .recommendation-alert {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem;
+    background-color: #ffebe9;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .recommendation-alert-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #ff3b30;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+  }
+  
+  /* Empty States */
+  .recommendation-empty-state {
+    padding: 2rem;
+    text-align: center;
+    background-color: #f9f9fb;
+    border-radius: 0.75rem;
+    color: #777;
+  }
+  
+  /* Selected Tasks Summary */
+  .recommendation-summary {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background-color: #f2f8ff;
+    border-radius: 1rem;
+  }
+  
+  .recommendation-summary-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 1.25rem 0;
+  }
+  
+  .recommendation-selected-tasks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .recommendation-selected-task {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .recommendation-selected-task-category {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0066cc;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  
+  .recommendation-selected-task-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .recommendation-summary-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .recommendation-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .recommendation-refresh-button {
+      align-self: flex-start;
+    }
+    
+    .recommendation-inputs {
+      flex-direction: column;
+    }
+    
+    .recommendation-cards {
+      grid-template-columns: 1fr;
+    }
+    
+    .recommendation-selected-tasks {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Focus and Accessibility */
+  .recommendation-button:focus,
+  .recommendation-select:focus,
+  .recommendation-feedback-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.3);
+  }
+  
+  /* High Contrast Mode */
+  @media (forced-colors: active) {
+    .recommendation-card-selected {
+      border: 2px solid CanvasText;
+    }
+    
+    .recommendation-button,
+    .recommendation-select,
+    .recommendation-badge {
+      border: 1px solid CanvasText;
+    }
+  }
+
+
+  .recommendation-filter-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--apple-blue);
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .recommendation-filter-button:hover {
+    background-color: var(--apple-blue-dark);
+  }
+  
+  .recommendation-filter-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* Loading State */
+  .recommendation-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+  
+  .recommendation-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(0, 113, 227, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--apple-blue);
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+  }
+  
+  /* Error State */
+  .recommendation-error {
+    padding: 2rem;
+    text-align: center;
+    background-color: rgba(255, 59, 48, 0.1);
+    border-radius: 0.5rem;
+    color: var(--error-red);
+  }
+  
+  .recommendation-error button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--error-red);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+  
+  .recommendation-error button:hover {
+    background-color: #d93026;
+  }
+  
+  /* Empty State */
+  .recommendation-empty {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--text-secondary);
+    background-color: var(--bg-secondary);
+    border-radius: 0.5rem;
+  }
+  
+  /* Recommendations Grid */
+  .recommendation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  /* Recommendation Card */
+  .recommendation-card {
+    background-color: var(--bg-primary);
+    border-radius: 1rem;
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .recommendation-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-color: var(--apple-blue);
+  }
+  
+  .recommendation-card-selected {
+    border: 2px solid var(--apple-blue);
+    box-shadow: 0 5px 15px rgba(0, 113, 227, 0.25);
+  }
+  
+  .recommendation-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+  }
+  
+  .recommendation-card-category {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+  }
+  
+  .recommendation-category-wellness {
+    background-color: #e6f7ff;
+    color: #0070f3;
+  }
+  
+  .recommendation-category-fitness {
+    background-color: #e6ffe6;
+    color: #00b300;
+  }
+  
+  .recommendation-category-learning {
+    background-color: #fff2e6;
+    color: #ff8000;
+  }
+  
+  .recommendation-category-creativity {
+    background-color: #f9e6ff;
+    color: #9900cc;
+  }
+  
+  .recommendation-category-productivity {
+    background-color: #e6e6ff;
+    color: #4d4dff;
+  }
+  
+  .recommendation-card-duration {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  
+  .recommendation-card-title {
+    padding: 0 1rem;
+    margin: 0 0 0.75rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .recommendation-card-description {
+    padding: 0 1rem;
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    flex-grow: 1;
+  }
+  
+  .recommendation-card-benefits {
+    padding: 0 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .recommendation-card-benefits h4 {
+    font-size: 0.9rem;
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+  }
+  
+  .recommendation-card-benefits ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+  
+  .recommendation-card-benefits li {
+    margin-bottom: 0.25rem;
+  }
+  
+  .recommendation-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-top: 1px solid var(--border-light);
+    background-color: var(--bg-secondary);
+  }
+  
+  .recommendation-difficulty {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+  }
+  
+  .recommendation-difficulty-easy {
+    background-color: #e6ffe6;
+    color: #00b300;
+  }
+  
+  .recommendation-difficulty-medium {
+    background-color: #fff2e6;
+    color: #ff8000;
+  }
+  
+  .recommendation-difficulty-hard {
+    background-color: #ffe6e6;
+    color: #ff3333;
+  }
+  
+  .recommendation-card-select {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--apple-blue);
+    display: flex;
+    align-items: center;
+  }
+  
+  .recommendation-icon-check {
+    width: 20px;
+    height: 20px;
+    stroke: var(--apple-blue);
+    stroke-width: 2.5;
+    fill: none;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .recommendation-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .recommendation-inputs {
+      flex-direction: column;
+    }
+    
+    .recommendation-input-group {
+      width: 100%;
+    }
+  }

@@ -95,3 +95,30 @@ export const SkeletonTaskList = () => {
     </div>
   );
 };
+
+
+// Add this new component for recommendations
+export const SkeletonRecommendations = () => {
+  return (
+    <div className="skeleton-recommendations">
+      {[1, 2, 3, 4, 5, 6].map((item) => (
+        <div key={item} className="skeleton-recommendation-card">
+          <div className="skeleton-recommendation-title"></div>
+          <div className="skeleton-recommendation-description"></div>
+          <div className="skeleton-recommendation-description-2"></div>
+          <div className="skeleton-recommendation-description-3"></div>
+          <div className="skeleton-recommendation-meta">
+            <div className="skeleton-badge"></div>
+            <div className="skeleton-badge skeleton-badge-small"></div>
+            <div className="skeleton-badge"></div>
+          </div>
+          <div className="skeleton-recommendation-button"></div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// If you prefer adding it without altering your existing file, you can do:
+// export { SkeletonRecommendations } from './SkeletonRecommendations';
+// And create a separate SkeletonRecommendations.js file

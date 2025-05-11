@@ -1,0 +1,448 @@
+/* RecommendationDashboard.css */
+:root {
+    --apple-blue: #0071e3;
+    --apple-blue-dark: #0058b3;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f7;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --border-light: #d2d2d7;
+    --border-medium: #c7c7cc;
+    --success-green: #34c759;
+    --warning-orange: #ff9500;
+    --error-red: #ff3b30;
+  }
+  
+  /* Dashboard Container */
+  .dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  }
+  
+  /* Dashboard Header */
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .dashboard-header-title-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .dashboard-back-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--apple-blue);
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dashboard-back-link:hover {
+    text-decoration: underline;
+  }
+  
+  .dashboard-back-icon {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+  }
+  
+  .dashboard-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .dashboard-header-actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  /* Dashboard Button */
+  .dashboard-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background-color: var(--apple-blue);
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .dashboard-button:hover {
+    background-color: var(--apple-blue-dark);
+  }
+  
+  .dashboard-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+  }
+  
+  /* Dashboard Tabs */
+  .dashboard-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 2rem;
+  }
+  
+  .dashboard-tab {
+    padding: 0.75rem 1.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .dashboard-tab:hover {
+    color: var(--text-primary);
+  }
+  
+  .dashboard-tab-active {
+    color: var(--apple-blue);
+    border-bottom: 2px solid var(--apple-blue);
+  }
+  
+  /* Dashboard Panel */
+  .dashboard-panel {
+    background-color: var(--bg-primary);
+    border-radius: 1rem;
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .recommendation-dashboard-content {
+    padding: 1.5rem;
+  }
+  
+  /* Toast Notifications - supporting the useToast component */
+  .toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .toast {
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: toast-slide-in 0.3s ease forwards;
+  }
+  
+  .toast-success {
+    background-color: var(--success-green);
+  }
+  
+  .toast-error {
+    background-color: var(--error-red);
+  }
+  
+  .toast-warning {
+    background-color: var(--warning-orange);
+  }
+  
+  .toast-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+  }
+  
+  .toast-message {
+    flex: 1;
+    font-weight: 500;
+  }
+  
+  .toast-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.25rem;
+  }
+  
+  @keyframes toast-slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .dashboard-container {
+      padding: 1rem;
+    }
+  
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  
+    .dashboard-header-actions {
+      width: 100%;
+    }
+  
+    .dashboard-button {
+      width: 100%;
+      justify-content: center;
+    }
+  
+    .dashboard-tabs {
+      overflow-x: auto;
+      width: 100%;
+      padding-bottom: 0.5rem;
+    }
+  
+    .dashboard-tab {
+      white-space: nowrap;
+      padding: 0.75rem 1rem;
+    }
+  }
+  /* Add these to your RecommendationDashboard.css */
+
+    .recommendation-content {
+        padding: 1rem;
+    }
+    
+    .recommendation-section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+    
+    .recommendation-section-description {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+    
+    .recommendation-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .recommendation-card {
+        background-color: var(--bg-primary);
+        border-radius: 1rem;
+        border: 1px solid var(--border-light);
+        overflow: hidden;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .recommendation-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        border-color: var(--apple-blue);
+    }
+    
+    .recommendation-card-header {
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .recommendation-card-category {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+    }
+    
+    .recommendation-category-wellness {
+        background-color: #e6f7ff;
+        color: #0070f3;
+    }
+    
+    .recommendation-category-fitness {
+        background-color: #e6ffe6;
+        color: #00b300;
+    }
+    
+    .recommendation-category-learning {
+        background-color: #fff2e6;
+        color: #ff8000;
+    }
+    
+    .recommendation-category-creativity {
+        background-color: #f9e6ff;
+        color: #9900cc;
+    }
+    
+    .recommendation-category-productivity {
+        background-color: #e6e6ff;
+        color: #4d4dff;
+    }
+    
+    .recommendation-card-duration {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+    
+    .recommendation-card-title {
+        padding: 0 1rem;
+        margin: 0 0 0.75rem 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    
+    .recommendation-card-description {
+        padding: 0 1rem;
+        margin: 0 0 1rem 0;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        flex-grow: 1;
+    }
+    
+    .recommendation-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-top: 1px solid var(--border-light);
+        background-color: var(--bg-secondary);
+    }
+    
+    .recommendation-difficulty {
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+    }
+    
+    .recommendation-difficulty-easy {
+        background-color: #e6ffe6;
+        color: #00b300;
+    }
+    
+    .recommendation-difficulty-medium {
+        background-color: #fff2e6;
+        color: #ff8000;
+    }
+    
+    .recommendation-difficulty-hard {
+        background-color: #ffe6e6;
+        color: #ff3333;
+    }
+    
+    .recommendation-card-button {
+        background-color: var(--apple-blue);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .recommendation-card-button:hover {
+        background-color: var(--apple-blue-dark);
+    }
+    
+    .recommendation-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+    
+    .recommendation-loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(0, 113, 227, 0.2);
+        border-radius: 50%;
+        border-top-color: var(--apple-blue);
+        animation: spin 1s ease-in-out infinite;
+        margin-bottom: 1.5rem;
+    }
+    
+    @keyframes spin {
+        to {
+        transform: rotate(360deg);
+        }
+    }
+    
+    .recommendation-error {
+        padding: 2rem;
+        text-align: center;
+        background-color: rgba(255, 59, 48, 0.1);
+        border-radius: 0.5rem;
+        margin: 2rem;
+    }
+    
+    .recommendation-error button {
+        margin-top: 1rem;
+        padding: 0.5rem 1.5rem;
+        background-color: var(--apple-blue);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
+    .recommendation-empty {
+        padding: 3rem 2rem;
+        text-align: center;
+        color: var(--text-secondary);
+        background-color: var(--bg-secondary);
+        border-radius: 0.5rem;
+        margin: 2rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .recommendation-card-grid {
+        grid-template-columns: 1fr;
+        }
+    }
+
+

@@ -1,25 +1,31 @@
+// Complete DashboardPage.js with Recommendation Integration
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllGoals } from '../api/goalApi';
 import { getTodayTasks, completeTask } from '../api/taskApi';
+import { getRecommendations } from '../api/recommendationApi'; // Import the recommendation API
 import { useToast } from '../components/ui/Toast';
 import { 
   SkeletonStatsGrid, 
   SkeletonGoalList, 
-  SkeletonTaskList 
+  SkeletonTaskList,
+  SkeletonRecommendations
 } from '../components/loaders/SkeletonLoaders';
 import { NoGoalsEmptyState, NoTasksEmptyState } from '../components/ui/EmptyState';
 import ErrorDisplay from '../components/ui/ErrorDisplay';
-import './DashboardPage.css'; // Apple-style elegant styling
+import './DashboardPage.css';
 
 const DashboardPage = () => {
   const [goals, setGoals] = useState([]);
   const [todayTasks, setTodayTasks] = useState([]);
+  const [recommendations, setRecommendations] = useState({});
   const [activeTab, setActiveTab] = useState('overview');
-  const [loading, setLoading] = useState({ goals: true, tasks: true });
-  const [error, setError] = useState({ goals: null, tasks: null });
+  const [loading, setLoading] = useState({ goals: true, tasks: true, recommendations: true });
+  const [error, setError] = useState({ goals: null, tasks: null, recommendations: null });
   const [refreshing, setRefreshing] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [currentMood, setCurrentMood] = useState('Neutral');
+  const [energyLevel, setEnergyLevel] = useState('Medium');
   
   const profileMenuRef = useRef(null);
   const toast = useToast();
@@ -28,6 +34,7 @@ const DashboardPage = () => {
   useEffect(() => {
     fetchGoals();
     fetchTasks();
+    fetchRecommendations();
   }, []);
 
   // Fetch goals data
@@ -76,11 +83,41 @@ const DashboardPage = () => {
     }
   };
 
+  // Fetch quick recommendations
+  const fetchRecommendations = async () => {
+    try {
+      setLoading(prev => ({ ...prev, recommendations: true }));
+      setError(prev => ({ ...prev, recommendations: null }));
+      
+      // Get time available - for quick recommendations, set to 30 minutes by default
+      const timeAvailable = 30;
+      
+      const response = await getRecommendations({ 
+        mood: currentMood, 
+        energyLevel, 
+        timeAvailable 
+      });
+      
+      if (response.success) {
+        setRecommendations(response.data || {});
+      } else {
+        setError(prev => ({ ...prev, recommendations: response.error || 'Failed to fetch recommendations' }));
+        setRecommendations({});
+      }
+    } catch (err) {
+      console.error('Error fetching recommendations:', err);
+      setError(prev => ({ ...prev, recommendations: 'An unexpected error occurred while fetching recommendations' }));
+      setRecommendations({});
+    } finally {
+      setLoading(prev => ({ ...prev, recommendations: false }));
+    }
+  };
+
   // Handle refresh button click
   const handleRefresh = async () => {
     try {
       setRefreshing(true);
-      await Promise.all([fetchGoals(), fetchTasks()]);
+      await Promise.all([fetchGoals(), fetchTasks(), fetchRecommendations()]);
       toast.success('Dashboard refreshed');
     } catch (err) {
       toast.error('Failed to refresh data');
@@ -171,6 +208,18 @@ const DashboardPage = () => {
     }
   };
 
+  // Handle mood change
+  const handleMoodChange = (mood) => {
+    setCurrentMood(mood);
+    fetchRecommendations();
+  };
+
+  // Handle energy level change
+  const handleEnergyChange = (level) => {
+    setEnergyLevel(level);
+    fetchRecommendations();
+  };
+
   // Format date helper function
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -184,6 +233,24 @@ const DashboardPage = () => {
     today.setHours(0, 0, 0, 0);
     return !task.isCompleted && taskDate < today;
   });
+
+  // Helper function to render a single recommendation card
+  const renderRecommendationCard = (recommendation) => {
+    if (!recommendation) return null;
+    
+    return (
+      <div className="dashboard-recommendation-card">
+        <h3 className="dashboard-recommendation-title">{recommendation.title}</h3>
+        <p className="dashboard-recommendation-description">{recommendation.description}</p>
+        <div className="dashboard-recommendation-meta">
+          <span className="dashboard-badge">{recommendation.duration} min</span>
+          <span className={`dashboard-badge dashboard-badge-${recommendation.difficulty.toLowerCase()}`}>
+            {recommendation.difficulty}
+          </span>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="dashboard-container">
@@ -259,7 +326,7 @@ const DashboardPage = () => {
         </div>
       </div>
       
-      {/* Tab Navigation */}
+      {/* Tab Navigation - Add a new "Recommendations" tab */}
       <div className="dashboard-tabs">
         <button
           onClick={() => setActiveTab('overview')}
@@ -278,6 +345,12 @@ const DashboardPage = () => {
           className={`dashboard-tab ${activeTab === 'tasks' ? 'dashboard-tab-active' : ''}`}
         >
           Tasks
+        </button>
+        <button
+          onClick={() => setActiveTab('recommendations')}
+          className={`dashboard-tab ${activeTab === 'recommendations' ? 'dashboard-tab-active' : ''}`}
+        >
+          Recommendations
         </button>
       </div>
       
@@ -582,82 +655,238 @@ const DashboardPage = () => {
             )}
           </div>
         )}
-        
+
         {activeTab === 'tasks' && (
-          <div className="dashboard-tasks-content">
-            {loading.tasks ? (
-              <div className="dashboard-loading">
-                <div className="dashboard-loading-spinner"></div>
-              </div>
-            ) : error.tasks ? (
+                  <div className="dashboard-tasks-content">
+                    {loading.tasks ? (
+                      <div className="dashboard-loading">
+                        <div className="dashboard-loading-spinner"></div>
+                      </div>
+                    ) : error.tasks ? (
+                      <ErrorDisplay 
+                        message={error.tasks} 
+                        onRetry={fetchTasks}
+                        inline={false}
+                      />
+                    ) : todayTasks.length === 0 ? (
+                      <NoTasksEmptyState />
+                    ) : (
+                      <div>
+                        <div className="dashboard-section-header">
+                          <h2 className="dashboard-section-title">Today's Tasks</h2>
+                          <div className="dashboard-task-summary">
+                            <span className="dashboard-task-count">
+                              {todayTasks.filter(t => t.isCompleted).length} of {todayTasks.length} completed
+                            </span>
+                            <div className="dashboard-progress-bar" style={{ width: '120px', marginLeft: '10px' }}>
+                              <div 
+                                className="dashboard-progress-value" 
+                                style={{ 
+                                  width: `${todayTasks.length > 0 
+                                    ? Math.round((todayTasks.filter(t => t.isCompleted).length / todayTasks.length) * 100) 
+                                    : 0}%` 
+                                }}
+                                aria-label={`${Math.round((todayTasks.filter(t => t.isCompleted).length / todayTasks.length) * 100)}% complete`}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="dashboard-detailed-task-list">
+                          {todayTasks.map(task => (
+                            <div key={task._id} className="dashboard-task-item dashboard-detailed-task-item">
+                              <div className="dashboard-task-checkbox">
+                                <input
+                                  type="checkbox"
+                                  id={`detailed-task-${task._id}`}
+                                  checked={task.isCompleted}
+                                  onChange={() => handleCompleteTask(task._id)}
+                                  className="dashboard-checkbox"
+                                />
+                                <label htmlFor={`detailed-task-${task._id}`} className="dashboard-checkbox-label"></label>
+                              </div>
+                              <div className="dashboard-detailed-task-content">
+                                <p className={`dashboard-task-title ${task.isCompleted ? 'dashboard-task-completed' : ''}`}>
+                                  {task.title}
+                                </p>
+                                {task.description && (
+                                  <p className="dashboard-task-description">
+                                    {task.description}
+                                  </p>
+                                )}
+                                <div className="dashboard-task-meta">
+                                  {task.goal && typeof task.goal === 'object' && (
+                                    <span className="dashboard-task-goal">
+                                      Goal: {task.goal.title}
+                                    </span>
+                                  )}
+                                  <span className={`dashboard-badge ${
+                                    task.priority === 'High' ? 'dashboard-badge-red' :
+                                    task.priority === 'Medium' ? 'dashboard-badge-yellow' :
+                                    'dashboard-badge-green'
+                                  }`}>
+                                    {task.priority}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+
+        {activeTab === 'recommendations' && (
+          <div className="dashboard-recommendations-content">
+            {loading.recommendations ? (
+              <SkeletonRecommendations />
+            ) : error.recommendations ? (
               <ErrorDisplay 
-                message={error.tasks} 
-                onRetry={fetchTasks}
+                message={error.recommendations} 
+                onRetry={fetchRecommendations}
                 inline={false}
               />
-            ) : todayTasks.length === 0 ? (
-              <NoTasksEmptyState />
+            ) : !recommendations.recommendedTasks || recommendations.recommendedTasks.length === 0 ? (
+              <div className="dashboard-empty-state">
+                <svg className="dashboard-empty-icon" viewBox="0 0 24 24">
+                  <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                <h3 className="dashboard-empty-title">No Recommendations Available</h3>
+                <p className="dashboard-empty-description">
+                  We couldn't find any activities that match your current preferences.
+                </p>
+                <div className="dashboard-empty-actions">
+                  <div className="dashboard-mood-selector">
+                    <label className="dashboard-input-label">Current Mood</label>
+                    <div className="dashboard-select-wrapper">
+                      <select 
+                        className="dashboard-select" 
+                        value={currentMood}
+                        onChange={(e) => handleMoodChange(e.target.value)}
+                      >
+                        <option value="Calm">Calm</option>
+                        <option value="Focused">Focused</option>
+                        <option value="Energetic">Energetic</option>
+                        <option value="Neutral">Neutral</option>
+                        <option value="Reflective">Reflective</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div className="dashboard-energy-selector">
+                    <label className="dashboard-input-label">Energy Level</label>
+                    <div className="dashboard-select-wrapper">
+                      <select 
+                        className="dashboard-select" 
+                        value={energyLevel}
+                        onChange={(e) => handleEnergyChange(e.target.value)}
+                      >
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    className="dashboard-button"
+                    onClick={fetchRecommendations}
+                  >
+                    <svg className="dashboard-icon" viewBox="0 0 24 24">
+                      <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh Recommendations
+                  </button>
+                  
+                  <Link
+                    to="/recommendations"
+                    className="dashboard-link-button"
+                  >
+                    Get More Recommendations
+                  </Link>
+                </div>
+              </div>
             ) : (
               <div>
                 <div className="dashboard-section-header">
-                  <h2 className="dashboard-section-title">Today's Tasks</h2>
-                  <div className="dashboard-task-summary">
-                    <span className="dashboard-task-count">
-                      {todayTasks.filter(t => t.isCompleted).length} of {todayTasks.length} completed
-                    </span>
-                    <div className="dashboard-progress-bar" style={{ width: '120px', marginLeft: '10px' }}>
-                      <div 
-                        className="dashboard-progress-value" 
-                        style={{ 
-                          width: `${todayTasks.length > 0 
-                            ? Math.round((todayTasks.filter(t => t.isCompleted).length / todayTasks.length) * 100) 
-                            : 0}%` 
-                        }}
-                        aria-label={`${Math.round((todayTasks.filter(t => t.isCompleted).length / todayTasks.length) * 100)}% complete`}
-                      ></div>
+                  <h2 className="dashboard-section-title">Recommended Activities</h2>
+                  <div className="dashboard-section-actions">
+                    <div className="dashboard-mood-selector">
+                      <label className="dashboard-input-label">Current Mood</label>
+                      <div className="dashboard-select-wrapper">
+                        <select 
+                          className="dashboard-select dashboard-select-small" 
+                          value={currentMood}
+                          onChange={(e) => handleMoodChange(e.target.value)}
+                        >
+                          <option value="Calm">Calm</option>
+                          <option value="Focused">Focused</option>
+                          <option value="Energetic">Energetic</option>
+                          <option value="Neutral">Neutral</option>
+                          <option value="Reflective">Reflective</option>
+                        </select>
+                      </div>
                     </div>
+                    
+                    <div className="dashboard-energy-selector">
+                      <label className="dashboard-input-label">Energy Level</label>
+                      <div className="dashboard-select-wrapper">
+                        <select 
+                          className="dashboard-select dashboard-select-small" 
+                          value={energyLevel}
+                          onChange={(e) => handleEnergyChange(e.target.value)}
+                        >
+                          <option value="Low">Low</option>
+                          <option value="Medium">Medium</option>
+                          <option value="High">High</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <Link
+                      to="/recommendations"
+                      className="dashboard-button dashboard-button-small"
+                    >
+                      <svg className="dashboard-icon dashboard-icon-small" viewBox="0 0 24 24">
+                        <path d="M9 5l7 7-7 7" />
+                      </svg>
+                      Full Recommendations
+                    </Link>
                   </div>
                 </div>
                 
-                <div className="dashboard-detailed-task-list">
-                  {todayTasks.map(task => (
-                    <div key={task._id} className="dashboard-task-item dashboard-detailed-task-item">
-                      <div className="dashboard-task-checkbox">
-                        <input
-                          type="checkbox"
-                          id={`detailed-task-${task._id}`}
-                          checked={task.isCompleted}
-                          onChange={() => handleCompleteTask(task._id)}
-                          className="dashboard-checkbox"
-                        />
-                        <label htmlFor={`detailed-task-${task._id}`} className="dashboard-checkbox-label"></label>
+                <div className="dashboard-recommendations-grid">
+                  {recommendations.recommendedTasks && recommendations.recommendedTasks.slice(0, 6).map(recommendation => (
+                    <div key={recommendation.id} className="dashboard-recommendation-card">
+                      <h3 className="dashboard-recommendation-title">{recommendation.title}</h3>
+                      <p className="dashboard-recommendation-description">{recommendation.description}</p>
+                      <div className="dashboard-recommendation-meta">
+                        <span className={`dashboard-badge dashboard-badge-category-${recommendation.category?.toLowerCase()}`}>
+                          {recommendation.category}
+                        </span>
+                        <span className="dashboard-badge">{recommendation.duration} min</span>
+                        <span className={`dashboard-badge dashboard-badge-${recommendation.difficulty?.toLowerCase()}`}>
+                          {recommendation.difficulty}
+                        </span>
                       </div>
-                      <div className="dashboard-detailed-task-content">
-                        <p className={`dashboard-task-title ${task.isCompleted ? 'dashboard-task-completed' : ''}`}>
-                          {task.title}
-                        </p>
-                        {task.description && (
-                          <p className="dashboard-task-description">
-                            {task.description}
-                          </p>
-                        )}
-                        <div className="dashboard-task-meta">
-                          {task.goal && typeof task.goal === 'object' && (
-                            <span className="dashboard-task-goal">
-                              Goal: {task.goal.title}
-                            </span>
-                          )}
-                          <span className={`dashboard-badge ${
-                            task.priority === 'High' ? 'dashboard-badge-red' :
-                            task.priority === 'Medium' ? 'dashboard-badge-yellow' :
-                            'dashboard-badge-green'
-                          }`}>
-                            {task.priority}
-                          </span>
-                        </div>
+                      <div className="dashboard-recommendation-actions">
+                        <Link
+                          to={`/recommendations?selected=${recommendation.id}`}
+                          className="dashboard-button dashboard-button-small"
+                        >
+                          Start Activity
+                        </Link>
                       </div>
                     </div>
                   ))}
+                </div>
+                
+                <div className="dashboard-view-all">
+                  <Link to="/recommendations" className="dashboard-link">
+                    View All Recommendations
+                  </Link>
                 </div>
               </div>
             )}

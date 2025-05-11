@@ -12,6 +12,12 @@ import GoalDetailPage from './pages/GoalDetailPage';
 import CreateGoalPage from './pages/CreateGoalPage';
 import ProfilePage from './pages/ProfilePage';
 import LogoutPage from './pages/LogoutPage';
+import NotFoundPage from './pages/NotFoundPage';
+import DebugErrorBoundary from './components/DebugErrorBoundary';
+import RecommendationDashboardPage from './pages/RecommendationDashboardPage';
+import UserPreferencesPage from './pages/UserPreferencesPage';
+import RecommendationHistoryPage from './pages/RecommendationHistoryPage';
+
 
 // Private route component
 const PrivateRoute = ({ children }) => {
@@ -42,49 +48,76 @@ const PrivateRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <ToastProvider>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/logout" element={<LogoutPage />} />
+      <DebugErrorBoundary>
+        <AuthProvider>
+          <ToastProvider>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/logout" element={<LogoutPage />} />
 
-            {/* Protected routes */}
-            <Route path="/dashboard" element={
-              <PrivateRoute>
-                  <DashboardPage />
-              </PrivateRoute>
-            } />
-            
-            <Route path="/goals" element={
-              <PrivateRoute>
-                  <GoalsPage />
-              </PrivateRoute>
-            } />
-            
-            <Route path="/goals/new" element={
-              <PrivateRoute>
-                  <CreateGoalPage />
-              </PrivateRoute>
-            } />
-            
-            <Route path="/goals/:goalId" element={
-              <PrivateRoute>
-                  <GoalDetailPage />
-              </PrivateRoute>
-            } />
-            
-            <Route path="/profile" element={
-              <PrivateRoute>
-                  <ProfilePage />
-              </PrivateRoute>
-            } />
-          </Routes>
-        </ToastProvider>
-      </AuthProvider>
+              {/* Protected routes */}
+              <Route path="/dashboard" element={
+                <PrivateRoute>
+                    <DashboardPage />
+                </PrivateRoute>
+              } />
+              
+              <Route path="/goals" element={
+                <PrivateRoute>
+                    <GoalsPage />
+                </PrivateRoute>
+              } />
+              
+              <Route path="/goals/new" element={
+                <PrivateRoute>
+                    <CreateGoalPage />
+                </PrivateRoute>
+              } />
+              
+              <Route path="/goals/:goalId" element={
+                <PrivateRoute>
+                    <GoalDetailPage />
+                </PrivateRoute>
+              } />
+
+              <Route 
+                path="/recommendations" 
+                element={
+                  <PrivateRoute>
+                    <RecommendationDashboardPage />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/recommendations/preferences" 
+                element={
+                  <PrivateRoute>
+                    <UserPreferencesPage />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/recommendations/history" 
+                element={
+                  <PrivateRoute>
+                    <RecommendationHistoryPage />
+                  </PrivateRoute>
+                } 
+              />
+              
+              <Route path="/profile" element={
+                <PrivateRoute>
+                    <ProfilePage />
+                </PrivateRoute>
+              } />
+            </Routes>
+          </ToastProvider>
+        </AuthProvider>
+      </DebugErrorBoundary>
     </Router>
   );
 }

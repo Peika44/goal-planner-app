@@ -1,141 +1,21 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+// src/components/ui/Toast.jsx
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
-// Toast context
+// Create context for the toast
 const ToastContext = createContext();
 
-// Toast types with corresponding styles
-const TOAST_TYPES = {
-  SUCCESS: {
-    bgColor: 'bg-green-500',
-    icon: (
-      <svg className="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-      </svg>
-    )
-  },
-  ERROR: {
-    bgColor: 'bg-red-500',
-    icon: (
-      <svg className="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-      </svg>
-    )
-  },
-  INFO: {
-    bgColor: 'bg-blue-500',
-    icon: (
-      <svg className="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-      </svg>
-    )
-  },
-  WARNING: {
-    bgColor: 'bg-yellow-500',
-    icon: (
-      <svg className="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-      </svg>
-    )
-  }
+// Toast types
+export const TOAST_TYPES = {
+  SUCCESS: 'success',
+  ERROR: 'error',
+  WARNING: 'warning',
+  INFO: 'info',
 };
 
-// Individual toast component
-const ToastItem = ({ id, message, type, onDismiss, autoClose = true }) => {
-  const toastType = TOAST_TYPES[type] || TOAST_TYPES.INFO;
-  
-  useEffect(() => {
-    if (autoClose) {
-      const timer = setTimeout(() => {
-        onDismiss(id);
-      }, 5000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [id, onDismiss, autoClose]);
-  
-  return (
-    <div 
-      className={`${toastType.bgColor} text-white p-3 rounded-md shadow-lg flex items-center justify-between mb-2 transform transition-all duration-300 ease-in-out translate-x-0 opacity-100`}
-      role="alert"
-    >
-      <div className="flex items-center">
-        <div className="mr-2">
-          {toastType.icon}
-        </div>
-        <div className="mr-8 text-sm font-medium">{message}</div>
-      </div>
-      <button 
-        onClick={() => onDismiss(id)} 
-        className="text-white focus:outline-none"
-        aria-label="Close"
-      >
-        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-        </svg>
-      </button>
-    </div>
-  );
-};
-
-// Toast container
-const ToastContainer = ({ toasts, onDismiss }) => {
-  return (
-    <div className="fixed top-4 right-4 z-50 w-72">
-      {toasts.map(toast => (
-        <ToastItem
-          key={toast.id}
-          id={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onDismiss={onDismiss}
-          autoClose={toast.autoClose}
-        />
-      ))}
-    </div>
-  );
-};
-
-// Toast provider component
-export const ToastProvider = ({ children }) => {
-  const [toasts, setToasts] = useState([]);
-  
-  // Add a new toast
-  const addToast = (message, type = 'INFO', autoClose = true) => {
-    const id = Date.now().toString();
-    setToasts(prev => [...prev, { id, message, type, autoClose }]);
-    return id;
-  };
-  
-  // Remove a toast by id
-  const removeToast = (id) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
-  
-  // Convenience methods
-  const success = (message, autoClose = true) => addToast(message, 'SUCCESS', autoClose);
-  const error = (message, autoClose = true) => addToast(message, 'ERROR', autoClose);
-  const info = (message, autoClose = true) => addToast(message, 'INFO', autoClose);
-  const warning = (message, autoClose = true) => addToast(message, 'WARNING', autoClose);
-  
-  // Context value
-  const value = {
-    addToast,
-    removeToast,
-    success,
-    error,
-    info,
-    warning
-  };
-  
-  return (
-    <ToastContext.Provider value={value}>
-      {children}
-      <ToastContainer toasts={toasts} onDismiss={removeToast} />
-    </ToastContext.Provider>
-  );
-};
-
-// Custom hook to use the toast context
+/**
+ * Custom hook to access the toast functionality
+ * @returns {Object} Toast methods
+ */
 export const useToast = () => {
   const context = useContext(ToastContext);
   if (!context) {
@@ -143,3 +23,139 @@ export const useToast = () => {
   }
   return context;
 };
+
+/**
+ * Individual Toast component
+ * @param {Object} props - Component props
+ * @returns {JSX.Element} Toast component
+ */
+const Toast = ({ id, type, message, duration, onClose }) => {
+  useEffect(() => {
+    if (duration) {
+      const timer = setTimeout(() => {
+        onClose(id);
+      }, duration);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [id, duration, onClose]);
+
+  // Define icon based on toast type
+  const renderIcon = () => {
+    switch (type) {
+      case TOAST_TYPES.SUCCESS:
+        return (
+          <svg className="toast-icon" viewBox="0 0 24 24">
+            <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      case TOAST_TYPES.ERROR:
+        return (
+          <svg className="toast-icon" viewBox="0 0 24 24">
+            <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      case TOAST_TYPES.WARNING:
+        return (
+          <svg className="toast-icon" viewBox="0 0 24 24">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      default:
+        return (
+          <svg className="toast-icon" viewBox="0 0 24 24">
+            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+    }
+  };
+
+  return (
+    <div className={`toast toast-${type}`}>
+      {renderIcon()}
+      <div className="toast-message">{message}</div>
+      <button className="toast-close" onClick={() => onClose(id)}>
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+    </div>
+  );
+};
+
+/**
+ * Toast provider component
+ * @param {Object} props - Component props
+ * @returns {JSX.Element} Toast provider
+ */
+export const ToastProvider = ({ children }) => {
+  const [toasts, setToasts] = useState([]);
+
+  // Remove a toast by ID
+  const closeToast = useCallback((id) => {
+    setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
+  }, []);
+
+  // Add a new toast
+  const addToast = useCallback(
+    (type, message, duration = 5000) => {
+      const id = Date.now().toString();
+      setToasts((prevToasts) => [
+        ...prevToasts,
+        { id, type, message, duration },
+      ]);
+      return id;
+    },
+    []
+  );
+
+  // Convenience methods for different toast types
+  const success = useCallback(
+    (message, duration) => addToast(TOAST_TYPES.SUCCESS, message, duration),
+    [addToast]
+  );
+
+  const error = useCallback(
+    (message, duration) => addToast(TOAST_TYPES.ERROR, message, duration),
+    [addToast]
+  );
+
+  const warning = useCallback(
+    (message, duration) => addToast(TOAST_TYPES.WARNING, message, duration),
+    [addToast]
+  );
+
+  const info = useCallback(
+    (message, duration) => addToast(TOAST_TYPES.INFO, message, duration),
+    [addToast]
+  );
+
+  // Clear all toasts
+  const clearAll = useCallback(() => {
+    setToasts([]);
+  }, []);
+
+  const value = {
+    addToast,
+    success,
+    error,
+    warning,
+    info,
+    clearAll,
+  };
+
+  return (
+    <ToastContext.Provider value={value}>
+      {children}
+      {toasts.length > 0 && (
+        <div className="toast-container">
+          {toasts.map((toast) => (
+            <Toast key={toast.id} {...toast} onClose={closeToast} />
+          ))}
+        </div>
+      )}
+    </ToastContext.Provider>
+  );
+};
+
+export default ToastProvider;
